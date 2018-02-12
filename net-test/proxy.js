@@ -22,9 +22,11 @@ wss.on('connection', function (ws) {
                 ws.send("Success!");
             });
             // carrier makes it line oriented
-            carrier.carry(client).on('line', function (data) {
-                ws.send(data, { binary: false });
-            });
+            carrier.carry(client, function (data) {
+                if (ws.readyState === ws.OPEN) {
+                    ws.send(data, { binary: false });
+                }
+            }, 'latin1', /\xff|\n/);
             client.on('error', function(err) {
                 ws.close();
             });

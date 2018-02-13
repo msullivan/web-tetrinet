@@ -43,6 +43,22 @@ export class ClearLine extends Special {
   }
 }
 
+export class RandomClear extends Special {
+  identifier = "R";
+
+  apply = (state: State) => {
+    // TODO
+  }
+}
+
+export class SwitchField extends Special {
+  identifier = "R";
+
+  apply = (state: State) => {
+    // TODO
+  }
+}
+
 export class NukeField extends Special {
   identifier = "N";
 
@@ -82,3 +98,6 @@ export class BlockBomb extends Special {
     // TODO
   }
 }
+
+const SPECIALS = [AddLine, ClearLine, NukeField, RandomClear, SwitchField,
+                  ClearSpecials, Gravity, QuakeField, BlockBomb];

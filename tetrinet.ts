@@ -2,6 +2,7 @@ import { State } from 'state';
 
 
 let state = new State();
+state.newPiece();
 
 function draw() {
   let canvas = document.getElementById('canvas') as HTMLCanvasElement;

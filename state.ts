@@ -1,13 +1,13 @@
 import { BOARD_WIDTH, BOARD_HEIGHT, INITIAL_X } from "consts";
 import { square, COLORS, randomColor, CLEARED_COLOR } from "draw_util";
-import { Shape, PIECES } from "pieces";
+import { Shape, Piece, randomPiece } from "pieces";
 import { randInt } from "util";
 
 export class State {
   board: number[][];
   x: number;
   y: number;
-  piece: number;
+  piece: Piece;
   orientation: number;
   color: number;
   timeoutID: number;
@@ -18,20 +18,12 @@ export class State {
     for (let i = 0; i < BOARD_WIDTH; i += 1) {
       this.board[i] = new Array(BOARD_HEIGHT);
     }
-
-    console.log(this.board);
-
-    this.piece = 3;
-    this.orientation = 0;
-    this.x = INITIAL_X;
-    this.y = 0;
-    this.color = 4;
     this.tickTime = 1000;
   }
 
   rotate = () => {
-    const new_orientation = (this.orientation + 1) % PIECES[this.piece].shapes.length;
-    if (this.intersects(PIECES[this.piece].shapes[new_orientation],
+    const new_orientation = (this.orientation + 1) % this.piece.shapes.length;
+    if (this.intersects(this.piece.shapes[new_orientation],
                         this.x, this.y)) {
       return;
     } else {
@@ -57,8 +49,7 @@ export class State {
   }
 
   curShape = () => {
-    // TODO: store piece object instead?
-    return PIECES[this.piece].shapes[this.orientation];
+    return this.piece.shapes[this.orientation];
   }
 
   move = (dx: number, dy: number) => {
@@ -92,8 +83,10 @@ export class State {
       }
     }
 
-    ctx.fillStyle = COLORS[this.color];
-    PIECES[this.piece].draw(ctx, this.x, this.y, this.orientation);
+    if (this.piece !== undefined) {
+      ctx.fillStyle = COLORS[this.color];
+      this.piece.draw(ctx, this.x, this.y, this.orientation);
+    }
   }
 
   removeLines = () => {
@@ -122,6 +115,14 @@ export class State {
     }
   }
 
+  newPiece = () => {
+    this.x = INITIAL_X;
+    this.y = 0;
+    this.color = randomColor();
+    this.piece = randomPiece();
+    this.orientation = randInt(this.piece.shapes.length);
+  }
+
   freeze = () => {
     const shape = this.curShape();
     for (let coord of shape.coords) {
@@ -130,10 +131,6 @@ export class State {
 
     this.removeLines();
 
-    this.x = INITIAL_X;
-    this.y = 0;
-    this.color = randomColor();
-    this.piece = randInt(PIECES.length); //randomPiece(); TODO
-    this.orientation = randInt(PIECES[this.piece].shapes.length);
+    this.newPiece();
   }
 }

@@ -1,4 +1,5 @@
 import { square } from 'draw_util';
+import { randInt} from 'util';
 
 export class Shape {
   coords: number[][];
@@ -69,3 +70,7 @@ export const PIECES = [
     new Shape([[0, 0], [0, 1], [0, 2], [-1, 1]])
   ])
 ];
+
+export function randomPiece(): Piece {
+  return PIECES[randInt(PIECES.length)];
+}

@@ -1,5 +1,6 @@
 import { BoardState } from 'boardstate';
-import { Special } from 'specials';
+import { Special, AddLine, ClearLine, NukeField, RandomClear, SwitchField,
+         ClearSpecials, Gravity, QuakeField, BlockBomb } from 'specials';
 import { Piece, randomPiece } from 'pieces';
 import { sizeCanvasForBoard } from 'draw_util';
 
@@ -39,6 +40,8 @@ export class GameState {
   pendingDraw: boolean;
 
   nextPiece: Piece;
+
+  debugMode: boolean;
 
   // TODO: context for specials area, and anything else we need.
   myBoardCanvas: HTMLCanvasElement;
@@ -149,6 +152,18 @@ export class GameState {
       this.freeze();
       this.newPiece();
       this.resetTimeout();
+    } else if (this.debugMode) {
+      if (event.key === 'a') {
+        AddLine.apply(this, 0);
+      } else if (event.key === 'c') {
+        ClearLine.apply(this, 0);
+      } else if (event.key === 'g') {
+        Gravity.apply(this, 0);
+      } else if (event.key === 'q') {
+        QuakeField.apply(this, 0);
+      } else if (event.key === 'n') {
+        NukeField.apply(this, 0);
+      }
     }
 
     this.requestDraw();

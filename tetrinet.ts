@@ -4,6 +4,8 @@ import { networkTest } from 'protocol';
 
 let state = new GameState(0, document.getElementById('canvas') as HTMLCanvasElement,
                           null, null);
+state.debugMode = true;
+
 document.addEventListener('keydown', state.onKeyDown);
 state.start();
 console.log("Loaded");

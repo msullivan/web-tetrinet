@@ -6,9 +6,9 @@ import { Special } from "specials";
 
 export class Cell {
   color: number;
-  special: Special;
+  special: typeof Special;
 
-  constructor(color: number, special: Special) {
+  constructor(color: number, special: typeof Special) {
     this.color = color;
     this.special = special;
   }
@@ -20,9 +20,14 @@ export class Cell {
     if (this.special !== undefined) {
       ctx.font = '30px Arial';
       ctx.fillStyle = 'rgb(0, 0, 0)';
-      draw_text(ctx, x, y, this.special.getIdentifier());
+      draw_text(ctx, x, y, this.special.identifier);
     }
   }
+
+  clearSpecials = () => {
+    this.special = undefined;
+  }
+
 }
 
 export class BoardState {

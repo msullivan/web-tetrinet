@@ -43,6 +43,14 @@ export class ClearLine extends Special {
   }
 }
 
+export class NukeField extends Special {
+  identifier = "N";
+
+  apply = (state: State) => {
+    // TODO
+  }
+}
+
 export class ClearSpecials extends Special {
   identifier = "B";
 
@@ -51,4 +59,26 @@ export class ClearSpecials extends Special {
   }
 }
 
-// TODO: all the others.
+export class Gravity extends Special {
+  identifier = "G";
+
+  apply = (state: State) => {
+    // TODO
+  }
+}
+
+export class QuakeField extends Special {
+  identifier = "Q";
+
+  apply = (state: State) => {
+    // TODO
+  }
+}
+
+export class BlockBomb extends Special {
+  identifier = "O";
+
+  apply = (state: State) => {
+    // TODO
+  }
+}

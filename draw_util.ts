@@ -33,7 +33,7 @@ export function randomColor(): number {
 export const CLEARED_COLOR = 'rgb(200, 200, 200)';
 
 
-export function sizeCanvasForBoard(canvas: HTMLCanvasElement) {
-  canvas.width = SQUARE_SIZE * BOARD_WIDTH + GAP * (BOARD_WIDTH + 1);
-  canvas.height = SQUARE_SIZE * BOARD_HEIGHT + GAP * (BOARD_HEIGHT + 1);
+export function sizeCanvasForBoard(canvas: HTMLCanvasElement, scale = 1.0) {
+  canvas.width = scale * (SQUARE_SIZE * BOARD_WIDTH + GAP * (BOARD_WIDTH + 1));
+  canvas.height = scale * (SQUARE_SIZE * BOARD_HEIGHT + GAP * (BOARD_HEIGHT + 1));
 }

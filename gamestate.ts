@@ -2,7 +2,6 @@ import { BoardState } from 'boardstate';
 import { Special, AddLine, ClearLine, NukeField, RandomClear, SwitchField,
          ClearSpecials, Gravity, QuakeField, BlockBomb } from 'specials';
 import { Piece, randomPiece } from 'pieces';
-import { sizeCanvasForBoard } from 'draw_util';
 
 export class GameParams {
   // See https://github.com/xale/iTetrinet/wiki/new-game-rules-string
@@ -68,8 +67,6 @@ export class GameState {
 
     this.myBoard().newPiece(randomPiece());
 
-    sizeCanvasForBoard(myBoardCanvas);
-    sizeCanvasForBoard(otherBoardCanvas[0]);
     this.myBoardCanvas = myBoardCanvas;
     this.otherBoardCanvas = otherBoardCanvas;
 
@@ -108,6 +105,16 @@ export class GameState {
 
   }
 
+  private playerNumToCanvas(i: number): HTMLCanvasElement {
+    if (i < this.myIndex) {
+      return this.otherBoardCanvas[i-1];
+    } else if (i == this.myIndex) {
+      return this.myBoardCanvas;
+    } else {
+      return this.otherBoardCanvas[i-2];
+    }
+  }
+
   private drawBoard = (canvas: HTMLCanvasElement, board: BoardState) => {
     const ctx = canvas.getContext('2d', { alpha: false });
 
@@ -118,8 +125,9 @@ export class GameState {
   }
 
   private draw = () => {
-    this.drawBoard(this.myBoardCanvas, this.myBoard());
-    this.drawBoard(this.otherBoardCanvas[0], this.playerBoard(1));
+    for (let i = 1; i <= this.boards.length; i++) {
+      this.drawBoard(this.playerNumToCanvas(i), this.playerBoard(i));
+    }
 
     this.pendingDraw = false;
   }
@@ -155,6 +163,7 @@ export class GameState {
   onKeyDown = (event: any) => {
     let state = this.myBoard();
 
+    let action = true;
     if (event.key === 'ArrowUp') {
       state.rotate();
     } else if (event.key === 'ArrowLeft') {
@@ -185,9 +194,16 @@ export class GameState {
         this.applySpecial(NukeField, 0);
       } else if (event.key === 'r') {
         this.applySpecial(RandomClear, 0);
+      } else {
+        action = false;
       }
+    } else {
+      action = false;
     }
 
+    if (action) {
+      event.preventDefault();
+    }
     this.requestDraw();
   }
 }

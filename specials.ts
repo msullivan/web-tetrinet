@@ -36,6 +36,32 @@ export class AddLine extends Special {
   }
 }
 
+export class ClassicAddLine extends Special {
+  // Note: this is not a special in the same sense as the others. This is used to
+  // add lines that result from someone else clearing lines, and is easiest to treat
+  // as if it were a special.
+  static identifier = undefined;
+
+  static apply = (state: GameState, sourcePlayer: number) => {
+    var board = state.myBoard();
+    for (let y = 0; y < BOARD_HEIGHT - 1; y += 1) {
+      for (let x = 0; x < BOARD_WIDTH; x += 1) {
+        board.board[x][y] = board.board[x][y+1];
+      }
+    }
+
+    const randomTile = (): Cell => {
+      return new Cell(randomColor(), undefined);
+    };
+
+    for (let x = 0; x < BOARD_WIDTH; x += 1) {
+      board.board[x][BOARD_HEIGHT - 1] = randomTile();
+    }
+
+    board.board[randInt(BOARD_WIDTH)][BOARD_HEIGHT - 1] = undefined;
+  }
+}
+
 export class ClearLine extends Special {
   static identifier = "C";
 

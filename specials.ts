@@ -40,7 +40,7 @@ export class ClassicAddLine extends Special {
   // Note: this is not a special in the same sense as the others. This is used to
   // add lines that result from someone else clearing lines, and is easiest to treat
   // as if it were a special.
-  static identifier = undefined;
+  static identifier: string = undefined;
 
   static apply = (state: GameState, sourcePlayer: number) => {
     var board = state.myBoard();

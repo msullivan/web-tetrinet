@@ -1,5 +1,5 @@
 import { State } from 'state';
-
+import { SQUARE_SIZE, BOARD_WIDTH, BOARD_HEIGHT, GAP } from 'consts';
 
 let state = new State();
 state.newPiece();
@@ -64,6 +64,9 @@ function keydown(event: any) {
   requestDraw();
 }
 
+let canvas = document.getElementById('canvas') as HTMLCanvasElement;
+canvas.width = SQUARE_SIZE * BOARD_WIDTH + GAP * (BOARD_WIDTH + 1);
+canvas.height = SQUARE_SIZE * BOARD_HEIGHT + GAP * (BOARD_HEIGHT + 1);
 document.addEventListener('keydown', keydown);
 load();
 tick();

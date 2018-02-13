@@ -2,14 +2,14 @@ import { SQUARE_SIZE, GAP } from "consts";
 import { randInt } from "util";
 
 export function draw_square(ctx: CanvasRenderingContext2D, x: number, y: number) {
-  ctx.fillRect(x * (SQUARE_SIZE + GAP), y * (SQUARE_SIZE + GAP),
+  ctx.fillRect(x * (SQUARE_SIZE + GAP) + GAP, y * (SQUARE_SIZE + GAP) + GAP,
                SQUARE_SIZE, SQUARE_SIZE);
 }
 
 export function draw_text(ctx: CanvasRenderingContext2D, x: number, y: number,
                           text: string) {
-  const new_x = x * (SQUARE_SIZE + GAP) + Math.floor(SQUARE_SIZE / 2);
-  const new_y = y * (SQUARE_SIZE + GAP) + Math.floor(SQUARE_SIZE / 2);
+  const new_x = x * (SQUARE_SIZE + GAP) + Math.floor((SQUARE_SIZE + GAP) / 2);
+  const new_y = y * (SQUARE_SIZE + GAP) + Math.floor((SQUARE_SIZE + GAP) / 2);
 
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";

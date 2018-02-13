@@ -123,7 +123,9 @@ export class State {
     }
   }
 
-  removeLines = () => {
+  removeLines = (): number => {
+    let count = 0;
+
     for (let lineNo = 0; lineNo < BOARD_HEIGHT; lineNo += 1) {
       let found = false;
       for (let x = 0; x < BOARD_WIDTH; x += 1) {
@@ -133,8 +135,13 @@ export class State {
         }
       }
 
-      if (!found) { this.removeLine(lineNo); }
+      if (!found) {
+        this.removeLine(lineNo);
+        count += 1;
+      }
     }
+
+    return count;
   }
 
   newPiece = () => {

@@ -1,8 +1,11 @@
 <html>
   <head>
-    <script src="tetrinet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.min.js"></script>
+    <script>
+      require(['tetrinet'], () => {});
+    </script>
   </head>
-  <body onload="load();">
+  <body">
     <canvas id="canvas" width="500" height="800"></canvas>
   </body>
 </html>

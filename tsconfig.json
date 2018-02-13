@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "amd",
+    "sourceMap": true
+  },
+  "files": [
+    "consts.ts",
+    "draw_util.ts",
+    "state.ts",
+    "tetrinet.ts",
+    "pieces.ts",
+    "util.ts"
+  ],
+  "outFile": "out.js"
+}

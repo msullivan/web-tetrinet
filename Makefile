@@ -1,3 +1,3 @@
 all: tetrinet.js
-tetrinet.js: tetrinet.ts
-	tsc $< --outfile $@ --sourceMap
+tetrinet.js: *.ts tsconfig.json
+	tsc --outfile $@ --sourceMap

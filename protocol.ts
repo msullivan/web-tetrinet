@@ -20,23 +20,6 @@ export function loginEncode(s: string): string {
   return enc;
 }
 
-// The proxy "protocol" has an extra round trip in it so the caller needs
-// to set up its onmessage handler in its onopen handler.
-function connectProxy(onopen: () => void): WebSocket {
-  var sock = new WebSocket("ws://localhost:8081/");
-  sock.onopen = (event) => {
-    sock.send("Hi!");
-  };
-
-  var ready = false;
-  var num = 0;
-  sock.onmessage = (event) => {
-    sock.onmessage = undefined;
-    onopen();
-  };
-  return sock;
-}
-
 const PARTIAL_UPDATE_CHARS = '!"#$%&\'()*+,-./'
 const    FULL_UPDATE_CHARS = '012345acnrsbgqo'
 let special_map: {[index:string]: typeof Special} = {};
@@ -100,6 +83,23 @@ function fieldUpdate(state: GameState, player: number, fieldstring: string) {
 }
 
 ///////////////////////////
+// The proxy "protocol" has an extra round trip in it so the caller needs
+// to set up its onmessage handler in its onopen handler.
+function connectProxy(onopen: () => void): WebSocket {
+  var sock = new WebSocket("ws://localhost:8081/");
+  sock.onopen = (event) => {
+    sock.send("Hi!");
+  };
+
+  var ready = false;
+  var num = 0;
+  sock.onmessage = (event) => {
+    sock.onmessage = undefined;
+    onopen();
+  };
+  return sock;
+}
+
 export function connectAndHandshake(
     username: string, onhandshake: (playerNum: number, sock: WebSocket) => void) {
   let s = 'tetrisstart ' + username + ' 1.13';

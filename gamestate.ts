@@ -143,6 +143,15 @@ export class GameState {
     // TODO: deal with effects of line removals.
   }
 
+  applySpecial = (special: typeof Special, fromPlayer: number) => {
+    special.apply(this, fromPlayer);
+
+    if (!this.myBoard().move(0, 0)) {
+      this.freeze();
+      this.newPiece();
+    }
+  }
+
   onKeyDown = (event: any) => {
     let state = this.myBoard();
 
@@ -165,15 +174,17 @@ export class GameState {
       this.resetTimeout();
     } else if (this.debugMode) {
       if (event.key === 'a') {
-        AddLine.apply(this, 0);
+        this.applySpecial(AddLine, 0);
       } else if (event.key === 'c') {
-        ClearLine.apply(this, 0);
+        this.applySpecial(ClearLine, 0);
       } else if (event.key === 'g') {
-        Gravity.apply(this, 0);
+        this.applySpecial(Gravity, 0);
       } else if (event.key === 'q') {
-        QuakeField.apply(this, 0);
+        this.applySpecial(QuakeField, 0);
       } else if (event.key === 'n') {
-        NukeField.apply(this, 0);
+        this.applySpecial(NukeField, 0);
+      } else if (event.key === 'r') {
+        this.applySpecial(RandomClear, 0);
       }
     }
 

@@ -1,6 +1,7 @@
 import { BoardState, Cell } from 'boardstate';
 import { GameState } from 'gamestate';
-import { BOARD_HEIGHT, BOARD_WIDTH, NUM_COLORS, BLOCK_BOMB_SAFE_ROWS }  from 'consts';
+import { BOARD_HEIGHT, BOARD_WIDTH, NUM_COLORS, SAFE_ROWS,
+         CLEAR_RANDOM_BLOCK_COUNT }  from 'consts';
 import { randInt } from 'util';
 import { randomColor } from 'draw_util';
 
@@ -32,8 +33,6 @@ export class AddLine extends Special {
     for (let x = 0; x < BOARD_WIDTH; x += 1) {
       board.board[x][BOARD_HEIGHT - 1] = randomTile();
     }
-
-    // TODO: recheck collisions.
   }
 }
 
@@ -42,7 +41,6 @@ export class ClearLine extends Special {
 
   static apply = (state: GameState, sourcePlayer: number) => {
     state.myBoard().removeLine(BOARD_HEIGHT - 1);
-    // TODO: recheck collisions.
   }
 }
 
@@ -50,7 +48,10 @@ export class RandomClear extends Special {
   static identifier = "R";
 
   static apply = (state: GameState, sourcePlayer: number) => {
-    // TODO
+    let myBoard = state.myBoard();
+    for (let i = 0; i < CLEAR_RANDOM_BLOCK_COUNT; i += 1) {
+      myBoard.board[randInt(BOARD_WIDTH)][randInt(BOARD_HEIGHT)] = undefined;
+    }
   }
 }
 
@@ -64,6 +65,15 @@ export class SwitchField extends Special {
     for (let x = 0; x < BOARD_WIDTH; x += 1) {
       for (let y = 0; y < BOARD_HEIGHT; y += 1) {
         myBoard.board[x][y] = theirBoard.board[x][y];
+      }
+    }
+
+    // If there are squares in the safe zone, remove lines until there aren't.
+    for (let x = 0; x < BOARD_WIDTH; x += 1) {
+      for (let y = 0; y < SAFE_ROWS; y += 1) {
+        if (myBoard.board[x][y] !== undefined) {
+          state.myBoard().removeLine(BOARD_HEIGHT - 1);
+        }
       }
     }
   }
@@ -135,7 +145,14 @@ export class QuakeField extends Special {
   static apply = (state: GameState, sourcePlayer: number) => {
     const myBoard = state.myBoard();
     const quakeRow = (y: number) => {
-      let offset = randInt(BOARD_WIDTH);
+      const i = randInt(22);
+      let offset = 0;
+
+      if (i < 1) { offset += 1; }
+      if (i < 4) { offset += 1; }
+      if (i < 11) { offset += 1; }
+
+      if (randInt(2) == 0) { offset = BOARD_WIDTH - offset; }
 
       let origRow = [];
       for (let x = 0; x < BOARD_WIDTH; x += 1) {
@@ -172,7 +189,7 @@ export class BlockBomb extends Special {
 
     const newCoords = (): [number, number] => {
       let newX = randInt(BOARD_WIDTH);
-      let newY = BLOCK_BOMB_SAFE_ROWS + randInt(BOARD_HEIGHT - BLOCK_BOMB_SAFE_ROWS);
+      let newY = SAFE_ROWS + randInt(BOARD_HEIGHT - SAFE_ROWS);
 
       return [newX, newY];
     }

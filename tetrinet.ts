@@ -51,7 +51,9 @@ function keydown(event: any) {
   } else if (event.key === 'ArrowRight') {
     state.move(1, 0);
   } else if (event.key === 'ArrowDown') {
-    state.move(0, 1);
+    if (!state.move(0, 1)) {
+      state.freeze();
+    }
     resetTimeout();
   } else if (event.key === ' ') {
     state.drop();

@@ -5,11 +5,13 @@ import { randomColor } from 'draw_util';
 
 export abstract class Special {
   apply: (state: State) => void;
-  identifier: string;
+  static identifier: string;
+
+  getIdentifier = () => { return (<typeof Special>this.constructor).identifier; }
 }
 
 export class AddLine extends Special {
-  identifier = "A";
+  static identifier = "A";
 
   apply = (state: State) => {
     for (let y = 0; y < BOARD_HEIGHT - 1; y += 1) {
@@ -35,7 +37,7 @@ export class AddLine extends Special {
 }
 
 export class ClearLine extends Special {
-  identifier = "C";
+  static identifier = "C";
 
   apply = (state: State) => {
     state.removeLine(BOARD_HEIGHT - 1);
@@ -44,7 +46,7 @@ export class ClearLine extends Special {
 }
 
 export class RandomClear extends Special {
-  identifier = "R";
+  static identifier = "R";
 
   apply = (state: State) => {
     // TODO
@@ -52,7 +54,7 @@ export class RandomClear extends Special {
 }
 
 export class SwitchField extends Special {
-  identifier = "R";
+  static identifier = "R";
 
   apply = (state: State) => {
     // TODO
@@ -60,7 +62,7 @@ export class SwitchField extends Special {
 }
 
 export class NukeField extends Special {
-  identifier = "N";
+  static identifier = "N";
 
   apply = (state: State) => {
     // TODO
@@ -68,7 +70,7 @@ export class NukeField extends Special {
 }
 
 export class ClearSpecials extends Special {
-  identifier = "B";
+  static identifier = "B";
 
   apply = (state: State) => {
     // TODO
@@ -76,7 +78,7 @@ export class ClearSpecials extends Special {
 }
 
 export class Gravity extends Special {
-  identifier = "G";
+  static identifier = "G";
 
   apply = (state: State) => {
     // TODO
@@ -84,7 +86,7 @@ export class Gravity extends Special {
 }
 
 export class QuakeField extends Special {
-  identifier = "Q";
+  static identifier = "Q";
 
   apply = (state: State) => {
     // TODO
@@ -92,12 +94,12 @@ export class QuakeField extends Special {
 }
 
 export class BlockBomb extends Special {
-  identifier = "O";
+  static identifier = "O";
 
   apply = (state: State) => {
     // TODO
   }
 }
 
-const SPECIALS = [AddLine, ClearLine, NukeField, RandomClear, SwitchField,
-                  ClearSpecials, Gravity, QuakeField, BlockBomb];
+export const SPECIALS = [AddLine, ClearLine, NukeField, RandomClear, SwitchField,
+                         ClearSpecials, Gravity, QuakeField, BlockBomb];

@@ -20,7 +20,7 @@ export class Cell {
     if (this.special !== undefined) {
       ctx.font = '30px Arial';
       ctx.fillStyle = 'rgb(0, 0, 0)';
-      draw_text(ctx, x, y, this.special.identifier);
+      draw_text(ctx, x, y, this.special.getIdentifier());
     }
   }
 }

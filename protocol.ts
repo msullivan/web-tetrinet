@@ -1,3 +1,4 @@
+import { SPECIALS, Special } from 'specials';
 
 export function loginEncode(s: string): string {
   const toHex = (x: number): string => {
@@ -33,6 +34,12 @@ function connectProxy(onopen: () => void): WebSocket {
   return sock;
 }
 
+const PARTIAL_UPDATE_CHARS = '!"#$%&\'()*+,-./'
+const    FULL_UPDATE_CHARS = '012345acnrsbgqo'
+let special_map: {[index:string]: typeof Special} = {};
+for (let spec of SPECIALS) {
+  special_map[spec.identifier.toLowerCase()] = spec;
+}
 
 ///////////////////////////
 export function networkTest() {

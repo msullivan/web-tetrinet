@@ -6,13 +6,11 @@ import { randomColor } from 'draw_util';
 export abstract class Special {
   apply: (state: State) => void;
   identifier: string;
-
-  constructor(identifier: string) {
-    this.identifier = identifier;
-  }
 }
 
 export class AddLine extends Special {
+  identifier = "A";
+
   apply = (state: State) => {
     for (let y = 0; y < BOARD_HEIGHT - 1; y += 1) {
       for (let x = 0; x < BOARD_WIDTH; x += 1) {
@@ -37,6 +35,8 @@ export class AddLine extends Special {
 }
 
 export class ClearLine extends Special {
+  identifier = "C";
+
   apply = (state: State) => {
     state.removeLine(BOARD_HEIGHT - 1);
     // TODO: recheck collisions.
@@ -44,6 +44,8 @@ export class ClearLine extends Special {
 }
 
 export class ClearSpecials extends Special {
+  identifier = "B";
+
   apply = (state: State) => {
     // TODO
   }

@@ -1,5 +1,5 @@
 import { BOARD_WIDTH, BOARD_HEIGHT, INITIAL_X } from "consts";
-import { draw_square, COLORS, randomColor, CLEARED_COLOR } from "draw_util";
+import { draw_square, COLORS, randomColor, CLEARED_COLOR, draw_text } from "draw_util";
 import { Shape, Piece, randomPiece } from "pieces";
 import { randInt } from "util";
 import { Special } from "specials";
@@ -16,6 +16,12 @@ export class Cell {
   draw = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
     ctx.fillStyle = COLORS[this.color];
     draw_square(ctx, x, y);
+
+    if (this.special !== undefined) {
+      ctx.font = '30px Arial';
+      ctx.fillStyle = 'rgb(0, 0, 0)';
+      draw_text(ctx, x, y, this.special.identifier);
+    }
   }
 }
 

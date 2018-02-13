@@ -1,4 +1,7 @@
+import { BOARD_WIDTH, BOARD_HEIGHT } from "consts";
 import { SPECIALS, Special } from 'specials';
+import { GameState } from 'gamestate';
+import { BoardState, Cell } from 'boardstate';
 
 export function loginEncode(s: string): string {
   const toHex = (x: number): string => {
@@ -41,29 +44,93 @@ for (let spec of SPECIALS) {
   special_map[spec.identifier.toLowerCase()] = spec;
 }
 
+function cellUpdate(board: BoardState, x: number, y: number,
+                    code: string) {
+  let color = 1;
+  let special = undefined;
+  if (special_map[code]) {
+    special = special_map[code];
+  } else {
+    color = parseInt(code);
+  }
+
+  if (color == 0) {
+    board.board[x][y] = undefined;
+  } else {
+    board.board[x][y] = new Cell(color, special);
+  }
+}
+
+function partialCodeToFull(part: string): string {
+  let i = PARTIAL_UPDATE_CHARS.indexOf(part);
+  return i == -1 ? null : FULL_UPDATE_CHARS[i];
+}
+
+const INDEX_CODE_BASE = "3".charCodeAt(0);
+function fieldUpdate(state: GameState, player: number, fieldstring: string) {
+  let isPartial = partialCodeToFull(fieldstring[0]) !== null;
+  let board = state.playerBoard(player);
+
+  if (isPartial) {
+    // Partial update
+    let code = null;
+    let i = 0;
+    while (i < fieldstring.length) {
+      let maybecode = partialCodeToFull(fieldstring[i]);
+      if (maybecode !== null) {
+        code = maybecode;
+        i++;
+      } else {
+        let x = fieldstring.charCodeAt(i) - INDEX_CODE_BASE;
+        let y = fieldstring.charCodeAt(i+1) - INDEX_CODE_BASE;
+        cellUpdate(board, x, y, code);
+        i += 2;
+      }
+    }
+  } else {
+    // Full update
+    for (let x = 0; x < BOARD_WIDTH; x++) {
+      for (let y = 0; y < BOARD_HEIGHT; y++) {
+        let i = x*BOARD_WIDTH + y;
+        cellUpdate(board, x, y, fieldstring[i])
+      }
+    }
+  }
+  state.requestDraw();
+}
+
 ///////////////////////////
-export function networkTest() {
-  let username = 'su11y';
+export function connectAndHandshake(
+    username: string, onhandshake: (playerNum: number, sock: WebSocket) => void) {
   let s = 'tetrisstart ' + username + ' 1.13';
-  console.log(s);
   let encoded = loginEncode(s);
 
   let sock: WebSocket;
-  let playerNum = -1;
   const process = (msg: MessageEvent) => {
-    // processing
+    // initial handshake -- we get a player number and then report our team
     let cmd = msg.data.split(' ');
     if (cmd[0] == 'playernum') {
-      playerNum = parseInt(cmd[1]);
+      let playerNum = parseInt(cmd[1]);
       // Now that we have our number, set our (dummy) team
       sock.send('team ' + playerNum + ' ');
+      sock.onmessage = null;
+      onhandshake(playerNum, sock);
     }
-    // logging
-    console.log("RECV:", msg.data);
   };
   sock = connectProxy(() => {
     sock.onmessage = process;
     sock.send(encoded);
     console.log("sending ", encoded);
   });
+}
+//
+
+export function processMessage(state: GameState, msg: MessageEvent) {
+  console.log('RECV:', msg.data)
+  let cmd = msg.data.split(' ');
+
+  if (cmd[0] == 'f') {
+    fieldUpdate(state, parseInt(cmd[1]), cmd[2]);
+  }
+
 }

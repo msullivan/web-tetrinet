@@ -69,15 +69,21 @@ export class GameState {
     this.myBoard().newPiece(randomPiece());
 
     sizeCanvasForBoard(myBoardCanvas);
+    sizeCanvasForBoard(otherBoardCanvas[0]);
     this.myBoardCanvas = myBoardCanvas;
+    this.otherBoardCanvas = otherBoardCanvas;
 
     // TODO:
     //this.nextPieceCtx = nextPieceCtx;
     //this.otherBoardCtx = otherBoardCtx;
   }
 
+  playerBoard = (n: number): BoardState => {
+    return this.boards[n-1];
+  }
+
   myBoard = (): BoardState => {
-    return this.boards[this.myIndex];
+    return this.playerBoard(this.myIndex);
   }
 
   newPiece = () => {
@@ -102,13 +108,18 @@ export class GameState {
 
   }
 
-  private draw = () => {
-    const ctx = this.myBoardCanvas.getContext('2d', { alpha: false });
+  private drawBoard = (canvas: HTMLCanvasElement, board: BoardState) => {
+    const ctx = canvas.getContext('2d', { alpha: false });
 
     ctx.fillStyle = 'rgb(0, 0, 0)';
-    ctx.fillRect(0, 0, this.myBoardCanvas.width, this.myBoardCanvas.height);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    this.myBoard().draw(ctx);
+    board.draw(ctx);
+  }
+
+  private draw = () => {
+    this.drawBoard(this.myBoardCanvas, this.myBoard());
+    this.drawBoard(this.otherBoardCanvas[0], this.playerBoard(1));
 
     this.pendingDraw = false;
   }

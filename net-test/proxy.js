@@ -2,7 +2,7 @@
 // npm install net ws carrier
 
 // connection info
-var port = 2083;
+var port = 31457;
 var host = 'localhost';
 // local info
 var listenPort = 8081;
@@ -22,11 +22,13 @@ wss.on('connection', function (ws) {
                 ws.send("Success!");
             });
             // carrier makes it line oriented
-            carrier.carry(client, function (data) {
+            function process(data) {
                 if (ws.readyState === ws.OPEN) {
                     ws.send(data, { binary: false });
                 }
-            }, 'latin1', /\xff|\n/);
+            }
+            carrier.carry(client, process, 'latin1', /\xff|\n/);
+            //client.on('data', process);
             client.on('error', function(err) {
                 ws.close();
             });
@@ -34,7 +36,7 @@ wss.on('connection', function (ws) {
                 ws.close();
             });
         } else {
-            client.write(msg);
+            client.write(msg + '\n');
         }
     });
     ws.on('close', function () {

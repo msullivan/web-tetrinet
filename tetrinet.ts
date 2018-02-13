@@ -1,5 +1,6 @@
 import { State } from 'state';
 import { SQUARE_SIZE, BOARD_WIDTH, BOARD_HEIGHT, GAP } from 'consts';
+import { networkTest } from 'protocol';
 
 let state = new State();
 state.newPiece();
@@ -71,3 +72,4 @@ document.addEventListener('keydown', keydown);
 load();
 tick();
 console.log("Loaded");
+networkTest();

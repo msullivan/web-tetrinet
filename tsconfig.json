@@ -11,7 +11,8 @@
     "tetrinet.ts",
     "pieces.ts",
     "util.ts",
-    "specials.ts"
+    "specials.ts",
+    "protocol.ts"
   ],
   "outFile": "out.js"
 }

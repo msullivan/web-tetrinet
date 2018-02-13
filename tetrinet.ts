@@ -4,6 +4,8 @@ import { State } from 'state';
 let state = new State();
 state.newPiece();
 
+let pendingDraw = false;
+
 function draw() {
   let canvas = document.getElementById('canvas') as HTMLCanvasElement;
   let ctx = canvas.getContext('2d', { alpha: false });
@@ -13,17 +15,25 @@ function draw() {
 
   state.draw(ctx);
 
+  pendingDraw = false;
+}
+
+function requestDraw() {
+  if (pendingDraw) { return; }
+  pendingDraw = true;
   requestAnimationFrame(draw);
 }
 
 function load() {
-  draw();
+  requestDraw();
 }
 
 function tick() {
   if (!state.move(0, 1)) { state.freeze(); }
 
   state.timeoutID = setTimeout(tick, state.tickTime);
+
+  requestDraw();
 }
 
 function resetTimeout() {
@@ -48,6 +58,8 @@ function keydown(event: any) {
     state.freeze();
     resetTimeout();
   }
+
+  requestDraw();
 }
 
 document.addEventListener('keydown', keydown);

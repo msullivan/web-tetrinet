@@ -3,7 +3,7 @@ import { square } from 'draw_util';
 export class Shape {
   coords: number[][];
 
-  constructor(coords) {
+  constructor(coords: number[][]) {
     this.coords = coords;
   }
 
@@ -16,7 +16,7 @@ export class Shape {
 
 export class Piece {
   shapes: Shape[];
-  constructor(shapes) {
+  constructor(shapes: Shape[]) {
     this.shapes = shapes;
   }
 

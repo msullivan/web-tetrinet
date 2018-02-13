@@ -61,7 +61,7 @@ export class State {
     return PIECES[this.piece].shapes[this.orientation];
   }
 
-  move = (dx, dy) => {
+  move = (dx: number, dy: number) => {
     let new_x = this.x + dx;
     let new_y = this.y + dy;
     let shape = this.curShape();
@@ -97,7 +97,7 @@ export class State {
   }
 
   removeLines = () => {
-    const removeLine = (lineNo) => {
+    const removeLine = (lineNo: number) => {
       for (; lineNo > 0; lineNo -= 1) {
         for (let x = 0; x < BOARD_WIDTH; x += 1) {
           this.board[x][lineNo] = this.board[x][lineNo - 1];

@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "module": "amd",
-    "sourceMap": true
+    "sourceMap": true,
+    "noImplicitAny": true
   },
   "files": [
     "consts.ts",

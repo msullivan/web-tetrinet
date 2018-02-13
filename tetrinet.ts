@@ -10,7 +10,7 @@ function draw() {
   ctx.fillStyle = 'rgb(0, 0, 0)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  new state.draw(ctx);
+  state.draw(ctx);
 
   requestAnimationFrame(draw);
 }
@@ -30,7 +30,7 @@ function resetTimeout() {
   state.timeoutID = setTimeout(tick, state.tickTime);
 }
 
-function keydown(event) {
+function keydown(event: any) {
   console.log(event.key);
 
   if (event.key === 'ArrowUp') {

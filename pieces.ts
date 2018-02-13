@@ -1,4 +1,4 @@
-import { square } from 'draw_util';
+import { draw_square } from 'draw_util';
 import { randInt} from 'util';
 
 export class Shape {
@@ -10,7 +10,7 @@ export class Shape {
 
   draw(ctx: CanvasRenderingContext2D, x: number, y: number) {
     for (let coord of this.coords) {
-      square(ctx, coord[0] + x, coord[1] + y);
+      draw_square(ctx, coord[0] + x, coord[1] + y);
     }
   }
 }

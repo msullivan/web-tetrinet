@@ -1,7 +1,7 @@
 import { SQUARE_SIZE, GAP } from "consts";
 import { randInt } from "util";
 
-export function square(ctx: CanvasRenderingContext2D, x: number, y: number) {
+export function draw_square(ctx: CanvasRenderingContext2D, x: number, y: number) {
   ctx.fillRect(x * (SQUARE_SIZE + GAP), y * (SQUARE_SIZE + GAP),
                SQUARE_SIZE, SQUARE_SIZE);
 }

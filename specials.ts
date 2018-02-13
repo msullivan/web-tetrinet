@@ -1,13 +1,18 @@
-import { State } from 'state';
+import { State, Cell } from 'state';
 import { BOARD_HEIGHT, BOARD_WIDTH, ADD_LINE_BLOCK_CHANCE }  from 'consts';
 import { randInt } from 'util';
 import { randomColor } from 'draw_util';
 
-abstract class Special {
+export abstract class Special {
   apply: (state: State) => void;
+  identifier: string;
+
+  constructor(identifier: string) {
+    this.identifier = identifier;
+  }
 }
 
-class AddLine extends Special {
+export class AddLine extends Special {
   apply = (state: State) => {
     for (let y = 0; y < BOARD_HEIGHT - 1; y += 1) {
       for (let x = 0; x < BOARD_WIDTH; x += 1) {
@@ -15,11 +20,11 @@ class AddLine extends Special {
       }
     }
 
-    const randomTile = (): number => {
+    const randomTile = (): Cell => {
       if (randInt(100) > ADD_LINE_BLOCK_CHANCE) {
         return undefined;
       } else {
-        return randomColor();
+        return new Cell(randomColor(), undefined);
       }
     };
 
@@ -31,14 +36,14 @@ class AddLine extends Special {
   }
 }
 
-class ClearLine extends Special {
+export class ClearLine extends Special {
   apply = (state: State) => {
     state.removeLine(BOARD_HEIGHT - 1);
     // TODO: recheck collisions.
   }
 }
 
-class ClearSpecials extends Special {
+export class ClearSpecials extends Special {
   apply = (state: State) => {
     // TODO
   }

@@ -1,10 +1,26 @@
 import { BOARD_WIDTH, BOARD_HEIGHT, INITIAL_X } from "consts";
-import { square, COLORS, randomColor, CLEARED_COLOR } from "draw_util";
+import { draw_square, COLORS, randomColor, CLEARED_COLOR } from "draw_util";
 import { Shape, Piece, randomPiece } from "pieces";
 import { randInt } from "util";
+import { Special } from "specials";
+
+export class Cell {
+  color: number;
+  special: Special;
+
+  constructor(color: number, special: Special) {
+    this.color = color;
+    this.special = special;
+  }
+
+  draw = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
+    ctx.fillStyle = COLORS[this.color];
+    draw_square(ctx, x, y);
+  }
+}
 
 export class State {
-  board: number[][];
+  board: Cell[][];
   x: number;
   y: number;
   piece: Piece;
@@ -75,11 +91,11 @@ export class State {
       for (let y = 0; y < BOARD_HEIGHT; y += 1) {
         const this_square = this.board[x][y];
         if (this_square === undefined) {
-            ctx.fillStyle = CLEARED_COLOR;
+          ctx.fillStyle = CLEARED_COLOR;
+          draw_square(ctx, x, y);
         } else {
-          ctx.fillStyle = COLORS[this_square];
+          this_square.draw(ctx, x, y);
         }
-        square(ctx, x, y);
       }
     }
 
@@ -126,7 +142,7 @@ export class State {
   freeze = () => {
     const shape = this.curShape();
     for (let coord of shape.coords) {
-      this.board[coord[0] + this.x][coord[1] + this.y] = this.color;
+      this.board[coord[0] + this.x][coord[1] + this.y] = new Cell(this.color, undefined);
     }
 
     this.removeLines();

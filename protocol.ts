@@ -1,7 +1,6 @@
 
 export function loginEncode(s: string): string {
     const toHex = (x: number): string => {
-        console.log(x, '=>', ('0'+x.toString(16)).substr(-2).toUpperCase());
         return ('0'+x.toString(16)).substr(-2).toUpperCase();
     };
 
@@ -28,7 +27,6 @@ function connectProxy(onopen: () => void): WebSocket {
     var ready = false;
     var num = 0;
     sock.onmessage = (event) => {
-        console.log("hey!");
         sock.onmessage = undefined;
         onopen();
     };
@@ -50,12 +48,11 @@ export function networkTest() {
         let cmd = msg.data.split(' ');
         if (cmd[0] == 'playernum') {
             playerNum = parseInt(cmd[1]);
-            // Now that we have our number, set our team
-            sock.send('team ' + playerNum + ' ' + username);
+            // Now that we have our number, set our (dummy) team
+            sock.send('team ' + playerNum + ' ');
         }
         // logging
-        let elem = document.getElementById("messages");
-        elem.innerHTML = elem.innerHTML + msg.data + "<br>";
+        console.log("RECV:", msg.data);
     };
     sock = connectProxy(() => {
         sock.onmessage = process;

@@ -1,4 +1,4 @@
-import { SQUARE_SIZE, GAP } from "consts";
+import { SQUARE_SIZE, GAP, BOARD_WIDTH, BOARD_HEIGHT } from "consts";
 import { randInt } from "util";
 
 export function draw_square(ctx: CanvasRenderingContext2D, x: number, y: number) {
@@ -31,3 +31,9 @@ export function randomColor(): number {
 }
 
 export const CLEARED_COLOR = 'rgb(200, 200, 200)';
+
+
+export function sizeCanvasForBoard(canvas: HTMLCanvasElement) {
+  canvas.width = SQUARE_SIZE * BOARD_WIDTH + GAP * (BOARD_WIDTH + 1);
+  canvas.height = SQUARE_SIZE * BOARD_HEIGHT + GAP * (BOARD_HEIGHT + 1);
+}

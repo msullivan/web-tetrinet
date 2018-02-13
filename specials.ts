@@ -1,10 +1,11 @@
-import { State, Cell } from 'state';
+import { BoardState, Cell } from 'boardstate';
+import { GameState } from 'gamestate';
 import { BOARD_HEIGHT, BOARD_WIDTH, ADD_LINE_BLOCK_CHANCE }  from 'consts';
 import { randInt } from 'util';
 import { randomColor } from 'draw_util';
 
 export abstract class Special {
-  apply: (state: State) => void;
+  apply: (state: GameState) => void;
   static identifier: string;
 
   getIdentifier = () => { return (<typeof Special>this.constructor).identifier; }
@@ -13,10 +14,11 @@ export abstract class Special {
 export class AddLine extends Special {
   static identifier = "A";
 
-  apply = (state: State) => {
+  apply = (state: GameState) => {
+    let board = state.myBoard();
     for (let y = 0; y < BOARD_HEIGHT - 1; y += 1) {
       for (let x = 0; x < BOARD_WIDTH; x += 1) {
-        state.board[x][y] = state.board[x][y+1];
+        board.board[x][y] = board.board[x][y+1];
       }
     }
 
@@ -29,7 +31,7 @@ export class AddLine extends Special {
     };
 
     for (let x = 0; x < BOARD_WIDTH; x += 1) {
-      state.board[x][BOARD_HEIGHT - 1] = randomTile();
+      board.board[x][BOARD_HEIGHT - 1] = randomTile();
     }
 
     // TODO: recheck collisions.
@@ -39,8 +41,8 @@ export class AddLine extends Special {
 export class ClearLine extends Special {
   static identifier = "C";
 
-  apply = (state: State) => {
-    state.removeLine(BOARD_HEIGHT - 1);
+  apply = (state: GameState) => {
+    state.myBoard().removeLine(BOARD_HEIGHT - 1);
     // TODO: recheck collisions.
   }
 }
@@ -48,7 +50,7 @@ export class ClearLine extends Special {
 export class RandomClear extends Special {
   static identifier = "R";
 
-  apply = (state: State) => {
+  apply = (state: GameState) => {
     // TODO
   }
 }
@@ -56,7 +58,7 @@ export class RandomClear extends Special {
 export class SwitchField extends Special {
   static identifier = "R";
 
-  apply = (state: State) => {
+  apply = (state: GameState) => {
     // TODO
   }
 }
@@ -64,7 +66,7 @@ export class SwitchField extends Special {
 export class NukeField extends Special {
   static identifier = "N";
 
-  apply = (state: State) => {
+  apply = (state: GameState) => {
     // TODO
   }
 }
@@ -72,7 +74,7 @@ export class NukeField extends Special {
 export class ClearSpecials extends Special {
   static identifier = "B";
 
-  apply = (state: State) => {
+  apply = (state: GameState) => {
     // TODO
   }
 }
@@ -80,7 +82,7 @@ export class ClearSpecials extends Special {
 export class Gravity extends Special {
   static identifier = "G";
 
-  apply = (state: State) => {
+  apply = (state: GameState) => {
     // TODO
   }
 }
@@ -88,7 +90,7 @@ export class Gravity extends Special {
 export class QuakeField extends Special {
   static identifier = "Q";
 
-  apply = (state: State) => {
+  apply = (state: GameState) => {
     // TODO
   }
 }
@@ -96,10 +98,16 @@ export class QuakeField extends Special {
 export class BlockBomb extends Special {
   static identifier = "O";
 
-  apply = (state: State) => {
+  apply = (state: GameState) => {
     // TODO
   }
 }
 
 export const SPECIALS = [AddLine, ClearLine, NukeField, RandomClear, SwitchField,
                          ClearSpecials, Gravity, QuakeField, BlockBomb];
+
+export function randomSpecial(specialsFreq: number[]): Special {
+  const result = randInt(100);
+
+  return new SPECIALS[specialsFreq[result] - 1]();
+}

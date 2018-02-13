@@ -7,12 +7,14 @@
   "files": [
     "consts.ts",
     "draw_util.ts",
-    "state.ts",
+    "boardstate.ts",
     "tetrinet.ts",
     "pieces.ts",
     "util.ts",
     "specials.ts",
-    "protocol.ts"
+    "protocol.ts",
+    "specials.ts",
+    "gamestate.ts"
   ],
   "outFile": "out.js"
 }

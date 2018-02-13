@@ -25,22 +25,22 @@ export class Cell {
   }
 }
 
-export class State {
+export class BoardState {
   board: Cell[][];
   x: number;
   y: number;
   piece: Piece;
   orientation: number;
   color: number;
-  timeoutID: number;
-  tickTime: number;
+  serverIndex: number; // What number the server thinks this board is
 
-  constructor() {
+  constructor(serverIndex: number) {
     this.board = new Array(BOARD_WIDTH);
     for (let i = 0; i < BOARD_WIDTH; i += 1) {
       this.board[i] = new Array(BOARD_HEIGHT);
     }
-    this.tickTime = 1000;
+
+    this.serverIndex = serverIndex;
   }
 
   rotate = () => {
@@ -144,11 +144,11 @@ export class State {
     return count;
   }
 
-  newPiece = () => {
+  newPiece = (piece: Piece) => {
     this.x = INITIAL_X;
     this.y = 0;
     this.color = randomColor();
-    this.piece = randomPiece();
+    this.piece = piece;
     this.orientation = randInt(this.piece.shapes.length);
   }
 
@@ -157,9 +157,5 @@ export class State {
     for (let coord of shape.coords) {
       this.board[coord[0] + this.x][coord[1] + this.y] = new Cell(this.color, undefined);
     }
-
-    this.removeLines();
-
-    this.newPiece();
   }
 }

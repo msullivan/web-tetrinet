@@ -89,19 +89,19 @@ export class State {
     }
   }
 
-  removeLines = () => {
-    const removeLine = (lineNo: number) => {
-      for (; lineNo > 0; lineNo -= 1) {
-        for (let x = 0; x < BOARD_WIDTH; x += 1) {
-          this.board[x][lineNo] = this.board[x][lineNo - 1];
-        }
-      }
-
+  removeLine = (lineNo: number) => {
+    for (; lineNo > 0; lineNo -= 1) {
       for (let x = 0; x < BOARD_WIDTH; x += 1) {
-        this.board[x][0] = undefined;
+        this.board[x][lineNo] = this.board[x][lineNo - 1];
       }
-    };
+    }
 
+    for (let x = 0; x < BOARD_WIDTH; x += 1) {
+      this.board[x][0] = undefined;
+    }
+  }
+
+  removeLines = () => {
     for (let lineNo = 0; lineNo < BOARD_HEIGHT; lineNo += 1) {
       let found = false;
       for (let x = 0; x < BOARD_WIDTH; x += 1) {
@@ -111,7 +111,7 @@ export class State {
         }
       }
 
-      if (!found) { removeLine(lineNo); }
+      if (!found) { this.removeLine(lineNo); }
     }
   }
 

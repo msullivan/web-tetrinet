@@ -10,7 +10,8 @@
     "state.ts",
     "tetrinet.ts",
     "pieces.ts",
-    "util.ts"
+    "util.ts",
+    "specials.ts"
   ],
   "outFile": "out.js"
 }

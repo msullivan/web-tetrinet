@@ -101,6 +101,8 @@ class State {
   piece: number;
   orientation: number;
   color: number;
+  timeoutID: number;
+  tickTime: number;
 
   constructor() {
     this.board = new Array(BOARD_WIDTH);
@@ -115,6 +117,7 @@ class State {
     this.x = INITIAL_X;
     this.y = 0;
     this.color = 4;
+    this.tickTime = 1000;
   }
 
   rotate = () => {
@@ -253,7 +256,12 @@ function load() {
 function tick() {
   if (!state.move(0, 1)) { state.freeze(); }
 
-  setTimeout(tick, 1000);
+  state.timeoutID = setTimeout(tick, state.tickTime);
+}
+
+function resetTimeout() {
+  clearTimeout(state.timeoutID);
+  state.timeoutID = setTimeout(tick, state.tickTime);
 }
 
 function keydown(event) {
@@ -266,11 +274,12 @@ function keydown(event) {
   } else if (event.key === 'ArrowRight') {
     state.move(1, 0);
   } else if (event.key === 'ArrowDown') {
-    // TODO: collision detection
     state.move(0, 1);
+    resetTimeout();
   } else if (event.key === ' ') {
     state.drop();
     state.freeze();
+    resetTimeout();
   }
 }
 

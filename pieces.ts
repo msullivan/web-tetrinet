@@ -78,3 +78,9 @@ export const PIECES = [
 export function randomPiece(): Piece {
   return PIECES[randInt(PIECES.length)];
 }
+
+// for debugging
+export function cyclePiece(p: Piece): Piece {
+  let i = (PIECES.indexOf(p)+1)%PIECES.length;
+  return PIECES[i];
+}

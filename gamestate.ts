@@ -1,7 +1,7 @@
 import { BoardState, Cell } from 'boardstate';
 import { Special, AddLine, ClearLine, NukeField, RandomClear, SwitchField,
          ClearSpecials, Gravity, QuakeField, BlockBomb, randomSpecial } from 'specials';
-import { Piece, randomPiece } from 'pieces';
+import { Piece, randomPiece, cyclePiece } from 'pieces';
 import { BOARD_HEIGHT, BOARD_WIDTH } from 'consts';
 import { COLORS, randomColor, CLEARED_COLOR, draw_square } from 'draw_util';
 import { randInt } from 'util';
@@ -354,6 +354,8 @@ export class GameState {
         this.applySpecial(RandomClear, 0);
       } else if (event.key === 'o') {
         this.applySpecial(BlockBomb, 0);
+      } else if (event.key === 'i') {
+        this.nextPiece = cyclePiece(this.nextPiece);
       } else {
         action = false;
       }

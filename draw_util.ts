@@ -18,11 +18,11 @@ export function draw_text(ctx: CanvasRenderingContext2D, x: number, y: number,
 
 export const COLORS: string[] = [
   undefined,
-  'rgb(150, 0, 0)',
-  'rgb(0, 150, 0)',
-  'rgb(0, 0, 150)',
-  'rgb(150, 150, 0)',
-  'rgb(150, 0, 150)',
+  'rgb(68,68,151)', // blue
+  'rgb(151, 151, 68)', // yellow
+  'rgb(68, 151, 68)', // green
+  'rgb(151, 68, 151)', // magenta
+  'rgb(151, 68, 68)', // red
 ];
 
 export function randomColor(): number {

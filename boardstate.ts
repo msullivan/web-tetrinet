@@ -41,7 +41,6 @@ export class BoardState {
   y: number;
   piece: Piece;
   orientation: number;
-  color: number;
   serverIndex: number; // What number the server thinks this board is
 
   constructor(serverIndex: number) {
@@ -116,7 +115,6 @@ export class BoardState {
     }
 
     if (this.piece !== undefined) {
-      ctx.fillStyle = COLORS[this.color];
       this.piece.draw(ctx, this.x, this.y, this.orientation);
     }
   }
@@ -166,10 +164,9 @@ export class BoardState {
     return [count, specials];
   }
 
-  newPiece = (piece: Piece, color: number, orientation: number) => {
+  newPiece = (piece: Piece, orientation: number) => {
     this.x = INITIAL_X;
     this.y = 0;
-    this.color = color;
     this.piece = piece;
     this.orientation = orientation;
   }
@@ -177,7 +174,7 @@ export class BoardState {
   freeze = () => {
     const shape = this.curShape();
     for (let coord of shape.coords) {
-      this.board[coord[0] + this.x][coord[1] + this.y] = new Cell(this.color, undefined);
+      this.board[coord[0] + this.x][coord[1] + this.y] = new Cell(this.piece.color, undefined);
     }
   }
 }

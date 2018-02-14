@@ -46,7 +46,6 @@ export class GameState {
 
   nextPiece: Piece;
   nextOrientation: number;
-  nextColor: number;
 
   debugMode: boolean;
 
@@ -112,16 +111,14 @@ export class GameState {
 
     this.nextPiece = randomPiece();
     this.nextOrientation = this.nextPiece.randomOrientation();
-    this.nextColor = randomColor();
 
-    this.myBoard().newPiece(randomPiece(), randomColor(), 0);
+    this.myBoard().newPiece(randomPiece(), 0);
   }
 
   newPiece = () => {
-    this.myBoard().newPiece(this.nextPiece, this.nextColor, this.nextOrientation);
+    this.myBoard().newPiece(this.nextPiece, this.nextOrientation);
     this.nextPiece = randomPiece();
     this.nextOrientation = this.nextPiece.randomOrientation();
-    this.nextColor = randomColor();
   }
 
   start = () => {
@@ -177,7 +174,6 @@ export class GameState {
         draw_square(ctx, x, y);
       }
     }
-    ctx.fillStyle = COLORS[this.nextColor];
     this.nextPiece.draw(ctx, 3, 2, this.nextOrientation);
   }
 

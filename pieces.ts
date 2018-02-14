@@ -1,4 +1,4 @@
-import { draw_square } from 'draw_util';
+import { draw_square, COLORS } from 'draw_util';
 import { randInt } from 'util';
 
 export class Shape {
@@ -17,12 +17,16 @@ export class Shape {
 
 export class Piece {
   shapes: Shape[];
-  constructor(shapes: Shape[]) {
+  color: number;
+
+  constructor(shapes: Shape[], color: number) {
     this.shapes = shapes;
+    this.color = color;
   }
 
   draw(ctx: CanvasRenderingContext2D, x: number, y: number, orientation: number) {
     const shape = this.shapes[orientation % this.shapes.length];
+    ctx.fillStyle = COLORS[this.color];
     shape.draw(ctx, x, y);
   }
 
@@ -37,42 +41,42 @@ export const PIECES = [
   new Piece([
     new Shape([[-2, 0], [-1, 0], [0, 0], [1, 0]]),
     new Shape([[0, 0], [0, 1], [0, 2], [0, 3]]),
-  ]),
+  ], 1),
   // 2x2
   new Piece([
     new Shape([[0, 0], [0, 1], [1, 0], [1, 1]]),
-  ]),
+  ], 2),
   // J
   new Piece([
     new Shape([[-1, 0], [-1, 1], [0, 1], [1, 1]]),
     new Shape([[-1, 0], [0, 0], [-1, 1], [-1, 2]]),
     new Shape([[-1, 0], [0, 0], [1, 0], [1, 1]]),
     new Shape([[0, 0], [0, 1], [0, 2], [-1, 2]])
-  ]),
+  ], 3),
   // L
   new Piece([
     new Shape([[1, 0], [-1, 1], [0, 1], [1, 1]]),
     new Shape([[-1, 0], [0, 2], [-1, 1], [-1, 2]]),
     new Shape([[-1, 0], [0, 0], [1, 0], [-1, 1]]),
     new Shape([[-1, 0], [0, 0], [0, 1], [0, 2]])
-  ]),
+  ], 4),
   // Z
   new Piece([
     new Shape([[-1, 0], [0, 0], [0, 1], [1, 1]]),
     new Shape([[0, 0], [-1, 1], [0, 1], [-1, 2]])
-  ]),
+  ], 5),
   // S
   new Piece([
     new Shape([[0, 0], [1, 0], [-1, 1], [0, 1]]),
     new Shape([[-1, 0], [-1, 1], [0, 1], [0, 2]]),
-  ]),
+  ], 1),
   // T
   new Piece([
     new Shape([[-1, 1], [0, 0], [0, 1], [1, 1]]),
     new Shape([[-1, 0], [-1, 1], [-1, 2], [0, 1]]),
     new Shape([[-1, 0], [0, 0], [1, 0], [0, 1]]),
     new Shape([[0, 0], [0, 1], [0, 2], [-1, 1]])
-  ])
+  ], 2)
 ];
 
 export function randomPiece(): Piece {

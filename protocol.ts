@@ -141,8 +141,8 @@ function endGame(state: GameState) {
 ///////////////////////////
 // The proxy "protocol" has an extra round trip in it so the caller needs
 // to set up its onmessage handler in its onopen handler.
-function connectProxy(onopen: () => void): WebSocket {
-  var sock = new WebSocket("ws://localhost:8081/");
+function connectProxy(url: string, onopen: () => void): WebSocket {
+  var sock = new WebSocket(url);
   sock.onopen = (event) => {
     sock.send("Hi!");
   };
@@ -157,7 +157,8 @@ function connectProxy(onopen: () => void): WebSocket {
 }
 
 export function connectAndHandshake(
-    username: string, onhandshake: (playerNum: number, sock: WebSocket) => void) {
+    url: string, username: string,
+    onhandshake: (playerNum: number, sock: WebSocket) => void) {
   let s = 'tetrisstart ' + username + ' 1.13';
   let encoded = loginEncode(s);
 
@@ -173,7 +174,7 @@ export function connectAndHandshake(
       onhandshake(playerNum, sock);
     }
   };
-  sock = connectProxy(() => {
+  sock = connectProxy(url, () => {
     sock.onmessage = process;
     sock.send(encoded);
     console.log("sending ", encoded);

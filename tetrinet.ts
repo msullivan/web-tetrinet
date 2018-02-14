@@ -3,6 +3,7 @@ import { SQUARE_SIZE, BOARD_WIDTH, BOARD_HEIGHT, GAP } from 'consts';
 import { connectAndHandshake, processMessage } from 'protocol';
 import { sizeCanvasForBoard } from 'draw_util';
 import { Special } from 'specials';
+import { randInt } from 'util';
 
 let mainCanvas = document.getElementById('canvas') as HTMLCanvasElement;
 sizeCanvasForBoard(mainCanvas);
@@ -46,8 +47,11 @@ function onUpdateSpecials(special: typeof Special) {
   }
 }
 
-let username = 'su11y';
+let hostname = window.location.hostname || "localhost";
+let url = "ws://" + hostname + ":8081/";
+let username = 'Guest' + randInt(10000);
 connectAndHandshake(
+  url,
   username,
   (playerNum: number, sock: WebSocket) => {
     state = new GameState(playerNum,

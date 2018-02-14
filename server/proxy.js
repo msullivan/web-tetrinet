@@ -1,17 +1,20 @@
 'use strict';
-// npm install net ws carrier
+// npm install net ws carrier connect serve-static
 
 // connection info
 var port = 31457;
 var host = 'localhost';
 // local info
 var listenPort = 8081;
+var httpListenPort = 8080;
 
 
 var WebSocketServer = require('ws').Server;
 var wss = new WebSocketServer({ port: listenPort });
 var net = require('net');
 var carrier = require('carrier');
+var connect = require('connect');
+var serveStatic = require('serve-static');
 
 
 wss.on('connection', function (ws) {
@@ -49,3 +52,5 @@ wss.on('connection', function (ws) {
 });
 
 console.log('Listening on', listenPort);
+
+connect().use(serveStatic('..')).listen(httpListenPort);

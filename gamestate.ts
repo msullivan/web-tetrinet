@@ -34,7 +34,7 @@ export class GameState {
   linesSinceLevel: number;
   linesSinceSpecial: number;
 
-  specials: Special[];
+  specials: (typeof Special)[];
 
   timeoutID: number;
   tickTime: number;
@@ -50,17 +50,21 @@ export class GameState {
 
   debugMode: boolean;
 
-  // TODO: context for specials area, and anything else we need.
   myBoardCanvas: HTMLCanvasElement;
   nextPieceCanvas: HTMLCanvasElement;
+  specialsCanvas: HTMLCanvasElement;
   otherBoardCanvas: HTMLCanvasElement[];
   sock: WebSocket;
+
+  onUpdateSpecials: (x: typeof Special) => void;
 
   constructor(myIndex: number,
               sock: WebSocket,
               myBoardCanvas: HTMLCanvasElement,
               nextPieceCanvas: HTMLCanvasElement,
+              specialsCanvas: HTMLCanvasElement,
               otherBoardCanvas: HTMLCanvasElement[],
+              onUpdateSpecials: (x: typeof Special) => void,
               params: GameParams) {
     this.pendingDraw = false;
 
@@ -76,15 +80,15 @@ export class GameState {
     this.sock = sock;
     this.myBoardCanvas = myBoardCanvas;
     this.otherBoardCanvas = otherBoardCanvas;
+    this.nextPieceCanvas = nextPieceCanvas;
+    this.specialsCanvas = specialsCanvas;
 
     this.params = params;
 
     this.specials = [];
 
-    this.nextPieceCanvas = nextPieceCanvas;
+    this.onUpdateSpecials = onUpdateSpecials;
 
-    // TODO:
-    //this.otherBoardCtx = otherBoardCtx;
   }
 
   playerBoard = (n: number): BoardState => {
@@ -162,23 +166,48 @@ export class GameState {
     board.draw(ctx);
   }
 
+  private drawPreview = (canvas: HTMLCanvasElement) => {
+    let ctx = canvas.getContext('2d', { alpha: false });
+    ctx.fillStyle = 'rgb(0, 0, 0)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = CLEARED_COLOR;
+    for (let x = 0; x < 6; x += 1) {
+      for (let y = 0; y < 6; y += 1) {
+        draw_square(ctx, x, y);
+      }
+    }
+    ctx.fillStyle = COLORS[this.nextColor];
+    this.nextPiece.draw(ctx, 3, 2, this.nextOrientation);
+  }
+
+  private drawSpecials = (canvas: HTMLCanvasElement) => {
+    let ctx = canvas.getContext('2d', { alpha: false });
+
+    ctx.fillStyle = 'rgb(0, 0, 0)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = CLEARED_COLOR;
+    for (let x = 0; x < 30; x += 1) {
+      draw_square(ctx, x, 0);
+    }
+
+    for (let i = 0; i < this.specials.length; i += 1) {
+      new Cell(0, this.specials[i]).draw(ctx, i, 0);
+    }
+  }
+
   private draw = () => {
     for (let i = 1; i <= this.boards.length; i++) {
       this.drawBoard(this.playerNumToCanvas(i), this.playerBoard(i));
     }
 
     if (this.nextPiece) {
-      let nextPieceCtx = this.nextPieceCanvas.getContext('2d', { alpha: false });
-      nextPieceCtx.fillStyle = 'rgb(0, 0, 0)';
-      nextPieceCtx.fillRect(0, 0, this.nextPieceCanvas.width, this.nextPieceCanvas.height);
-      nextPieceCtx.fillStyle = CLEARED_COLOR;
-      for (let x = 0; x < 6; x += 1) {
-        for (let y = 0; y < 6; y += 1) {
-          draw_square(nextPieceCtx, x, y);
-        }
-      }
-      nextPieceCtx.fillStyle = COLORS[this.nextColor];
-      this.nextPiece.draw(nextPieceCtx, 3, 2, this.nextOrientation);
+      this.drawPreview(this.nextPieceCanvas);
+    }
+
+    this.drawSpecials(this.specialsCanvas);
+
+    if (this.onUpdateSpecials !== undefined) {
+      this.onUpdateSpecials(this.specials[0]);
     }
 
     this.pendingDraw = false;

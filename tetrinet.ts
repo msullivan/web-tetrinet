@@ -2,11 +2,13 @@ import { GameState, GameParams } from 'gamestate';
 import { SQUARE_SIZE, BOARD_WIDTH, BOARD_HEIGHT, GAP } from 'consts';
 import { connectAndHandshake, processMessage } from 'protocol';
 import { sizeCanvasForBoard } from 'draw_util';
+import { Special } from 'specials';
 
 let mainCanvas = document.getElementById('canvas') as HTMLCanvasElement;
 sizeCanvasForBoard(mainCanvas);
 
 let nextPieceCanvas = document.getElementById('preview') as HTMLCanvasElement;
+let specialsCanvas = document.getElementById('specials') as HTMLCanvasElement;
 
 let otherCanvases: HTMLCanvasElement[] = [];
 let OTHER_SCALE = 0.5;
@@ -35,6 +37,15 @@ for (let i = 0; i < 100; i += 1) {
 export let state: GameState = null;
 console.log("Loaded");
 
+function onUpdateSpecials(special: typeof Special) {
+  let elem = document.getElementById('specials-caption');
+  if (special !== undefined) {
+    elem.innerHTML = special.desc;
+  } else {
+    elem.innerHTML = '';
+  }
+}
+
 let username = 'su11y';
 connectAndHandshake(
   username,
@@ -43,7 +54,9 @@ connectAndHandshake(
                           sock,
                           mainCanvas,
                           nextPieceCanvas,
+                          specialsCanvas,
                           otherCanvases,
+                          onUpdateSpecials,
                           params);
     document.addEventListener('keydown', state.onKeyDown);
     state.debugMode = true;

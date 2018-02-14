@@ -8,10 +8,12 @@ import { randomColor } from 'draw_util';
 export abstract class Special {
   static apply: (state: GameState, sourcePlayer: number) => void;
   static identifier: string;
+  static desc: string;
 }
 
 export class AddLine extends Special {
   static identifier = "A";
+  static desc = "Add line";
 
   static apply = (state: GameState, sourcePlayer: number) => {
     const board = state.myBoard();
@@ -41,6 +43,7 @@ export class ClassicAddLine extends Special {
   // add lines that result from someone else clearing lines, and is easiest to treat
   // as if it were a special.
   static identifier: string = undefined;
+  static desc: string = undefined;
 
   static apply = (state: GameState, sourcePlayer: number) => {
     const board = state.myBoard();
@@ -64,6 +67,7 @@ export class ClassicAddLine extends Special {
 
 export class ClearLine extends Special {
   static identifier = "C";
+  static desc = "Clear line";
 
   static apply = (state: GameState, sourcePlayer: number) => {
     state.myBoard().removeLine(BOARD_HEIGHT - 1);
@@ -72,6 +76,7 @@ export class ClearLine extends Special {
 
 export class RandomClear extends Special {
   static identifier = "R";
+  static desc = "Clear random";
 
   static apply = (state: GameState, sourcePlayer: number) => {
     const myBoard = state.myBoard();
@@ -82,7 +87,8 @@ export class RandomClear extends Special {
 }
 
 export class SwitchField extends Special {
-  static identifier = "R";
+  static identifier = "S";
+  static desc = "Switch fields";
 
   static apply = (state: GameState, sourcePlayer: number) => {
     const theirBoard = state.boards[sourcePlayer];
@@ -107,6 +113,7 @@ export class SwitchField extends Special {
 
 export class NukeField extends Special {
   static identifier = "N";
+  static desc = "Nuke field";
 
   static apply = (state: GameState, sourcePlayer: number) => {
     const myBoard = state.myBoard();
@@ -121,6 +128,7 @@ export class NukeField extends Special {
 
 export class ClearSpecials extends Special {
   static identifier = "B";
+  static desc = "Clear specials";
 
   static apply = (state: GameState, sourcePlayer: number) => {
     const myBoard = state.myBoard();
@@ -138,6 +146,7 @@ export class ClearSpecials extends Special {
 
 export class Gravity extends Special {
   static identifier = "G";
+  static desc = "Block gravity";
 
   static apply = (state: GameState, sourcePlayer: number) => {
     const myBoard = state.myBoard();
@@ -167,6 +176,7 @@ export class Gravity extends Special {
 
 export class QuakeField extends Special {
   static identifier = "Q";
+  static desc = "Blockquake";
 
   static apply = (state: GameState, sourcePlayer: number) => {
     const myBoard = state.myBoard();
@@ -198,6 +208,7 @@ export class QuakeField extends Special {
 
 export class BlockBomb extends Special {
   static identifier = "O";
+  static desc = "Block bomb";
 
   static apply = (state: GameState, sourcePlayer: number) => {
     const myBoard = state.myBoard();

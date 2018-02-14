@@ -127,11 +127,6 @@ export class GameState {
     this.linesSinceSpecial = 0;
     this.specials = [];
     this.activePlayers = [];
-    for (let i = 0; i < 6; i += 1) {
-      if (this.playerNames[i] !== undefined) {
-        this.activePlayers[i] = true;
-      }
-    }
 
     this.updateLabels();
 
@@ -168,6 +163,12 @@ export class GameState {
   start = () => {
     this.halt();
     this.timeoutID = setTimeout(this.tick, this.tickTime);
+    for (let i = 0; i < 6; i += 1) {
+      if (this.playerNames[i] !== undefined) {
+        this.activePlayers[i] = true;
+      }
+    }
+    this.updateLabels();
     this.status = Status.Playing;
     this.messagePane.clearMessages();
     this.message("The game has <b>started<b>.");

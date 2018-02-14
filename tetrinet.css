@@ -2,16 +2,39 @@ canvas {
     position: fixed;
 }
 
+div.label {
+    position: fixed;
+    font-weight: bold;
+}
+
 canvas.canvas-0 {
     left: 600px;
+}
+
+div.label-2 {
+    left: 690px;
+    top: 365px;
+    font-size: 16pt;
 }
 
 canvas.canvas-1 {
     left: 800px;
 }
 
+div.label-3 {
+    left: 890px;
+    top: 365px;
+    font-size: 16pt;
+}
+
 canvas.canvas-2 {
     left: 1000px;
+}
+
+div.label-4 {
+    left: 1090px;
+    top: 365px;
+    font-size: 16pt;
 }
 
 canvas.canvas-3 {
@@ -19,9 +42,21 @@ canvas.canvas-3 {
     top:  400px;
 }
 
+div.label-5 {
+    left: 890px;
+    top: 758px;
+    font-size: 16pt;
+}
+
 canvas.canvas-4 {
     left: 1000px;
     top:  400px;
+}
+
+div.label-6 {
+    left: 1090px;
+    top: 758px;
+    font-size: 16pt;
 }
 
 canvas.preview {

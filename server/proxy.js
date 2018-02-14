@@ -1,21 +1,26 @@
 'use strict';
-// npm install net ws carrier connect serve-static
+// npm install net ws carrier connect serve-static yargs
+
+const args = require('yargs').argv;
 
 // connection info
-var port = 31457;
-var host = 'localhost';
+var port = args['tetrinet-port'] || 31457;
+var host = args['tetrinet-host'] || 'localhost';
 // local info
-var listenPort = 8081;
-var httpListenPort = 8080;
-
+var listenPort = args['websocket-port'] || 8081;
+var httpListenPort = args['http-port'] || 8080;
+var httpServer = args['http-server'] === undefined ? true : args['http-server'];
 
 var WebSocketServer = require('ws').Server;
 var wss = new WebSocketServer({ port: listenPort });
 var net = require('net');
 var carrier = require('carrier');
-var connect = require('connect');
-var serveStatic = require('serve-static');
 
+if (httpServer) {
+  var connect = require('connect');
+  var serveStatic = require('serve-static');
+  connect().use(serveStatic(__dirname + '/..')).listen(httpListenPort);
+}
 
 wss.on('connection', function (ws) {
   var client;
@@ -52,5 +57,3 @@ wss.on('connection', function (ws) {
 });
 
 console.log('Listening on', listenPort);
-
-connect().use(serveStatic('..')).listen(httpListenPort);

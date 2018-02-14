@@ -39,11 +39,13 @@ wss.on('connection', function (ws) {
       client.write(msg + '\n');
     }
   });
-  ws.on('close', function () {
+  function wsclose() {
     if (client) {
       client.end();
     }
-  });
+  }
+  ws.on('close', wsclose);
+  ws.on('error', wsclose);
 });
 
 console.log('Listening on', listenPort);

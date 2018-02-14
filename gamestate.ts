@@ -296,7 +296,7 @@ export class GameState {
       action = false;
     }
 
-    if (action) {
+    if (action && !event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey) {
       event.preventDefault();
     }
     this.requestDraw();

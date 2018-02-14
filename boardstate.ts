@@ -21,6 +21,7 @@ export class Cell {
       ctx.font = '30px Arial';
       ctx.fillStyle = 'rgb(0, 0, 0)';
       draw_text(ctx, x, y, this.special.identifier);
+      console.log(this.special);
     }
   }
 
@@ -116,9 +117,14 @@ export class BoardState {
     }
   }
 
-  removeLine = (lineNo: number) => {
+  removeLine = (lineNo: number): (typeof Special)[] => {
+    let specials: (typeof Special)[] = [];
     for (; lineNo > 0; lineNo -= 1) {
       for (let x = 0; x < BOARD_WIDTH; x += 1) {
+        if (this.board[x][lineNo] !== undefined &&
+            this.board[x][lineNo].special !== undefined) {
+          specials.push(this.board[x][lineNo].special);
+        }
         this.board[x][lineNo] = this.board[x][lineNo - 1];
       }
     }
@@ -126,10 +132,13 @@ export class BoardState {
     for (let x = 0; x < BOARD_WIDTH; x += 1) {
       this.board[x][0] = undefined;
     }
+
+    return specials;
   }
 
-  removeLines = (): number => {
+  removeLines = (): [number, (typeof Special)[]] => {
     let count = 0;
+    let specials: (typeof Special)[] = [];
 
     for (let lineNo = 0; lineNo < BOARD_HEIGHT; lineNo += 1) {
       let found = false;
@@ -141,12 +150,13 @@ export class BoardState {
       }
 
       if (!found) {
-        this.removeLine(lineNo);
+        const specials_removed = this.removeLine(lineNo);
+        specials = specials.concat(specials_removed);
         count += 1;
       }
     }
 
-    return count;
+    return [count, specials];
   }
 
   newPiece = (piece: Piece) => {

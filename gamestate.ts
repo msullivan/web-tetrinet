@@ -1,7 +1,10 @@
-import { BoardState } from 'boardstate';
+import { BoardState, Cell } from 'boardstate';
 import { Special, AddLine, ClearLine, NukeField, RandomClear, SwitchField,
-         ClearSpecials, Gravity, QuakeField, BlockBomb } from 'specials';
+         ClearSpecials, Gravity, QuakeField, BlockBomb, randomSpecial } from 'specials';
 import { Piece, randomPiece } from 'pieces';
+import { BOARD_HEIGHT, BOARD_WIDTH } from 'consts';
+import { randomColor } from 'draw_util';
+import { randInt } from 'util';
 
 export class GameParams {
   // See https://github.com/xale/iTetrinet/wiki/new-game-rules-string
@@ -50,7 +53,8 @@ export class GameState {
   constructor(myIndex: number,
               myBoardCanvas: HTMLCanvasElement,
               nextPieceCanvas: HTMLCanvasElement,
-              otherBoardCanvas: HTMLCanvasElement[]) {
+              otherBoardCanvas: HTMLCanvasElement[],
+              params: GameParams) {
     this.tickTime = 1000;
     this.level = 0;
     this.linesSinceLevel = 0;
@@ -69,6 +73,10 @@ export class GameState {
 
     this.myBoardCanvas = myBoardCanvas;
     this.otherBoardCanvas = otherBoardCanvas;
+
+    this.params = params;
+
+    this.specials = [];
 
     // TODO:
     //this.nextPieceCtx = nextPieceCtx;
@@ -145,10 +153,97 @@ export class GameState {
     this.requestDraw();
   }
 
+  private addSpecials = (num: number) => {
+    const board = this.myBoard();
+
+    let blockCount = 0;
+    for (let x = 0; x < BOARD_WIDTH; x += 1) {
+      for (let y = 0; y < BOARD_HEIGHT; y += 1) {
+        if (board.board[x][y] !== undefined &&
+            board.board[x][y].special === undefined) {
+          blockCount += 1;
+        }
+      }
+    }
+
+    while (blockCount > 0 && num > 0) {
+      let idx = randInt(blockCount);
+      let done = false;
+
+      for (let x = 0; x < BOARD_WIDTH; x += 1) {
+        for (let y = 0; y < BOARD_HEIGHT; y += 1) {
+          if (board.board[x][y] !== undefined &&
+              board.board[x][y].special === undefined) {
+            if (idx == 0) {
+              board.board[x][y].special = randomSpecial(this.params.specialFrequencies);
+              done = true;
+              break;
+            } else {
+              idx -= 1;
+            }
+          }
+        }
+        if (done) { break; }
+      }
+
+      blockCount -= 1;
+      num -= 1;
+    }
+
+    while (num > 0) {
+      // This is silly, but it's what tetrinet does...
+
+      let found = false;
+      for (let i = 0; i < 20; i += 1) {
+        const column = randInt(BOARD_WIDTH);
+        let isEmpty = true;
+        for (let y = 0; y < BOARD_HEIGHT; y += 1) {
+          if (board.board[column][y] !== undefined) {
+            isEmpty = false;
+            break;
+          }
+        }
+
+        if (isEmpty) {
+          board.board[column][BOARD_HEIGHT - 1] = new Cell(
+            randomColor(),
+            randomSpecial(this.params.specialFrequencies)
+          );
+          num -= 1;
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) { break; }
+    }
+  }
+
+  private removeLines = () => {
+    const [linesRemoved, specialsRemoved] = this.myBoard().removeLines();
+
+    this.linesSinceSpecial += linesRemoved;
+
+    const specialsToAdd = Math.floor(this.linesSinceSpecial / this.params.linesPerSpecial) *
+          this.params.specialsAdded;
+    this.linesSinceSpecial %= this.params.linesPerSpecial;
+
+    this.addSpecials(specialsToAdd);
+
+    for (let special of specialsRemoved) {
+      if (this.specials.length >= this.params.specialCapacity) { break; }
+      for (let i = 0; i < linesRemoved; i += 1) {
+        if (this.specials.length >= this.params.specialCapacity) { break; }
+        this.specials.push(special);
+      }
+    }
+
+    // TODO: tell the server we removed lines.
+  }
+
   private freeze = () => {
     this.myBoard().freeze();
-    const linesRemoved = this.myBoard().removeLines();
-    // TODO: deal with effects of line removals.
+    this.removeLines();
   }
 
   applySpecial = (special: typeof Special, fromPlayer: number) => {

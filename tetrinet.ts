@@ -1,4 +1,4 @@
-import { GameState } from 'gamestate';
+import { GameState, GameParams } from 'gamestate';
 import { SQUARE_SIZE, BOARD_WIDTH, BOARD_HEIGHT, GAP } from 'consts';
 import { connectAndHandshake, processMessage } from 'protocol';
 import { sizeCanvasForBoard } from 'draw_util';
@@ -19,6 +19,15 @@ for (let i = 0; i < 5; i++) {
   otherCanvases.push(canvas);
 }
 
+let params = new GameParams();
+params.linesPerSpecial = 1;
+params.specialsAdded = 1;
+params.specialCapacity = 30;
+params.specialFrequencies = []
+for (let i = 0; i < 100; i += 1) {
+  params.specialFrequencies.push(Math.floor(i/11.2));
+}
+
 let state: GameState = null;
 console.log("Loaded");
 
@@ -29,7 +38,8 @@ connectAndHandshake(
     state = new GameState(playerNum,
                           mainCanvas,
                           null,
-                          otherCanvases);
+                          otherCanvases,
+                          params);
     document.addEventListener('keydown', state.onKeyDown);
     state.debugMode = true;
     state.start();

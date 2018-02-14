@@ -14,7 +14,7 @@ export class AddLine extends Special {
   static identifier = "A";
 
   static apply = (state: GameState, sourcePlayer: number) => {
-    var board = state.myBoard();
+    const board = state.myBoard();
     for (let y = 0; y < BOARD_HEIGHT - 1; y += 1) {
       for (let x = 0; x < BOARD_WIDTH; x += 1) {
         board.board[x][y] = board.board[x][y+1];
@@ -43,7 +43,7 @@ export class ClassicAddLine extends Special {
   static identifier: string = undefined;
 
   static apply = (state: GameState, sourcePlayer: number) => {
-    var board = state.myBoard();
+    const board = state.myBoard();
     for (let y = 0; y < BOARD_HEIGHT - 1; y += 1) {
       for (let x = 0; x < BOARD_WIDTH; x += 1) {
         board.board[x][y] = board.board[x][y+1];
@@ -74,7 +74,7 @@ export class RandomClear extends Special {
   static identifier = "R";
 
   static apply = (state: GameState, sourcePlayer: number) => {
-    let myBoard = state.myBoard();
+    const myBoard = state.myBoard();
     for (let i = 0; i < CLEAR_RANDOM_BLOCK_COUNT; i += 1) {
       myBoard.board[randInt(BOARD_WIDTH)][randInt(BOARD_HEIGHT)] = undefined;
     }
@@ -243,11 +243,13 @@ export class BlockBomb extends Special {
   }
 }
 
-export const SPECIALS = [AddLine, ClearLine, NukeField, RandomClear, SwitchField,
-                         ClearSpecials, Gravity, QuakeField, BlockBomb];
+export const SPECIALS: (typeof Special)[] = [
+  AddLine, ClearLine, NukeField, RandomClear, SwitchField,
+  ClearSpecials, Gravity, QuakeField, BlockBomb
+];
 
-export function randomSpecial(specialsFreq: number[]): Special {
+export function randomSpecial(specialsFreq: number[]): typeof Special {
   const result = randInt(100);
 
-  return new SPECIALS[specialsFreq[result] - 1]();
+  return SPECIALS[specialsFreq[result]];
 }

@@ -67,6 +67,8 @@ export class GameState {
 
   playerNames: string[];
 
+  activePlayers: boolean[];
+
   onUpdateSpecials: (x: typeof Special) => void;
 
   constructor(myIndex: number,
@@ -98,6 +100,7 @@ export class GameState {
     this.params = params;
 
     this.specials = [];
+    this.activePlayers = [];
 
     this.onUpdateSpecials = onUpdateSpecials;
 
@@ -123,6 +126,14 @@ export class GameState {
     this.linesSinceLevel = 0;
     this.linesSinceSpecial = 0;
     this.specials = [];
+    this.activePlayers = [];
+    for (let i = 0; i < 6; i += 1) {
+      if (this.playerNames[i] !== undefined) {
+        this.activePlayers[i] = true;
+      }
+    }
+
+    this.updateLabels();
 
     this.boards = [];
     for (let i = 0; i < 6; i += 1) {
@@ -196,21 +207,49 @@ export class GameState {
     this.timeoutID = setTimeout(this.tick, this.tickTime);
   }
 
+  private updateLabels = () => {
+    for (let i = 0; i < 6; i += 1) {
+      const localId = this.serverToLocalNumber(i);
+      if (localId === 1) { continue; }
+      const nameElement = document.getElementById('playername-'+localId);
+      const labelElement = document.getElementById('label-'+localId);
+      if (this.playerNames[i] === undefined) {
+        nameElement.innerHTML = '';
+        labelElement.classList.add('inactive-player');
+      } else {
+        nameElement.innerText = this.playerNames[i];
+        if (this.activePlayers[i]) {
+          labelElement.classList.remove('inactive-player');
+        } else {
+          labelElement.classList.add('inactive-player');
+        }
+      }
+    }
+  }
+
   // Player state management
   playerName = (num: number): string => {
     return escapeHtml(this.playerNames[num]);
   }
   playerJoin = (num: number, name: string) => {
     this.playerNames[num] = name;
+    this.updateLabels();
   }
   playerLeave = (num: number) => {
     this.playerNames[num] = undefined;
+    this.updateLabels();
   }
   playerWon = (num: number) => {
     this.message("Player " + this.playerName(num) + " has won!");
+    for (let i = 0; i < 6; i += 1) {
+      this.activePlayers[num] = false;
+    }
+    this.updateLabels();
   }
   playerLost = (num: number) => {
     this.message("Player " + this.playerName(num) + " has lost!");
+    this.activePlayers[num] = false;
+    this.updateLabels();
   }
 
   //
@@ -398,20 +437,34 @@ export class GameState {
     }
   }
 
+  private localToServerNumber = (playerNum: number) => {
+    if (playerNum === 1) {
+      return this.myIndex;
+    } else {
+      if (playerNum > this.myIndex) {
+        return playerNum;
+      } else {
+        return playerNum - 1;
+      }
+    }
+  }
+
+  private serverToLocalNumber = (serverNum: number) => {
+    if (serverNum === this.myIndex) {
+      return 1;
+    } else if (serverNum < this.myIndex) {
+      return serverNum + 1;
+    } else {
+      return serverNum;
+    }
+  }
+
   private sendSpecial = (playerNum: number) => {
     if (playerNum === 0 || playerNum > 6) { return; }
     if (this.specials.length === 0) { return; }
 
-    let serverNum;
-    if (playerNum === 1) {
-      serverNum = this.myIndex;
-    } else {
-      if (playerNum > this.myIndex) {
-        serverNum = playerNum;
-      } else {
-        serverNum = playerNum - 1;
-      }
-    }
+    let serverNum = this.localToServerNumber(playerNum);
+    if (!this.activePlayers[serverNum]) { return; }
 
     let special = this.specials.shift();
 

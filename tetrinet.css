@@ -7,12 +7,20 @@ div.label {
     font-weight: bold;
 }
 
+div.playername {
+    display: inline;
+}
+
+div.inactive-player {
+    color: rgb(200, 200, 200);
+}
+
 canvas.canvas-0 {
     left: 600px;
 }
 
 div.label-2 {
-    left: 690px;
+    left: 630px;
     top: 365px;
     font-size: 16pt;
 }
@@ -22,7 +30,7 @@ canvas.canvas-1 {
 }
 
 div.label-3 {
-    left: 890px;
+    left: 830px;
     top: 365px;
     font-size: 16pt;
 }
@@ -32,7 +40,7 @@ canvas.canvas-2 {
 }
 
 div.label-4 {
-    left: 1090px;
+    left: 1030px;
     top: 365px;
     font-size: 16pt;
 }
@@ -43,7 +51,7 @@ canvas.canvas-3 {
 }
 
 div.label-5 {
-    left: 890px;
+    left: 830px;
     top: 758px;
     font-size: 16pt;
 }
@@ -54,7 +62,7 @@ canvas.canvas-4 {
 }
 
 div.label-6 {
-    left: 1090px;
+    left: 1030px;
     top: 758px;
     font-size: 16pt;
 }

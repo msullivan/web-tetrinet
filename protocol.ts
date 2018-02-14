@@ -20,6 +20,25 @@ export function loginEncode(s: string): string {
   return enc;
 }
 
+function formatFullUpdate(board: BoardState): string {
+  let update = "";
+  for (let y = 0; y < BOARD_HEIGHT; y++) {
+    for (let x = 0; x < BOARD_WIDTH; x++) {
+      let cell = board.board[x][y];
+      let c: string;
+      if (cell === undefined) {
+        c = '0';
+      } else if (cell.special !== undefined) {
+        c = cell.special.identifier.toLowerCase();
+      } else {
+        c = cell.color.toString();
+      }
+      update += c;
+    }
+  }
+  return update;
+}
+
 const PARTIAL_UPDATE_CHARS = '!"#$%&\'()*+,-./'
 const    FULL_UPDATE_CHARS = '012345acnrsbgqo'
 let special_map: {[index:string]: typeof Special} = {};
@@ -72,9 +91,9 @@ function fieldUpdate(state: GameState, player: number, fieldstring: string) {
     }
   } else {
     // Full update
-    for (let x = 0; x < BOARD_WIDTH; x++) {
-      for (let y = 0; y < BOARD_HEIGHT; y++) {
-        let i = x*BOARD_WIDTH + y;
+    for (let y = 0; y < BOARD_HEIGHT; y++) {
+      for (let x = 0; x < BOARD_WIDTH; x++) {
+        let i = y*BOARD_WIDTH + x;
         cellUpdate(board, x, y, fieldstring[i])
       }
     }
@@ -124,6 +143,12 @@ export function connectAndHandshake(
   });
 }
 //
+
+export function sendFieldUpdate(sock: WebSocket, num: number, board: BoardState) {
+  // We always send a full update, since it is easy to compute and why not
+  let update = formatFullUpdate(board);
+  sock.send('f ' + num + ' ' + update);
+}
 
 export function processMessage(state: GameState, msg: MessageEvent) {
   console.log('RECV:', msg.data)

@@ -5,6 +5,7 @@ import { Piece, randomPiece } from 'pieces';
 import { BOARD_HEIGHT, BOARD_WIDTH } from 'consts';
 import { randomColor } from 'draw_util';
 import { randInt } from 'util';
+import { sendFieldUpdate } from 'protocol';
 
 export class GameParams {
   // See https://github.com/xale/iTetrinet/wiki/new-game-rules-string
@@ -49,8 +50,10 @@ export class GameState {
   myBoardCanvas: HTMLCanvasElement;
   nextPieceCanvas: HTMLCanvasElement;
   otherBoardCanvas: HTMLCanvasElement[];
+  sock: WebSocket;
 
   constructor(myIndex: number,
+              sock: WebSocket,
               myBoardCanvas: HTMLCanvasElement,
               nextPieceCanvas: HTMLCanvasElement,
               otherBoardCanvas: HTMLCanvasElement[],
@@ -71,6 +74,7 @@ export class GameState {
 
     this.myBoard().newPiece(randomPiece());
 
+    this.sock = sock;
     this.myBoardCanvas = myBoardCanvas;
     this.otherBoardCanvas = otherBoardCanvas;
 
@@ -244,6 +248,7 @@ export class GameState {
   private freeze = () => {
     this.myBoard().freeze();
     this.removeLines();
+    sendFieldUpdate(this.sock, this.myIndex, this.myBoard());
   }
 
   applySpecial = (special: typeof Special, fromPlayer: number) => {

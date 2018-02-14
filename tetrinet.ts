@@ -36,6 +36,7 @@ connectAndHandshake(
   username,
   (playerNum: number, sock: WebSocket) => {
     state = new GameState(playerNum,
+                          sock,
                           mainCanvas,
                           null,
                           otherCanvases,

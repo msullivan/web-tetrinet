@@ -182,7 +182,8 @@ export function connectAndHandshake(
 }
 //
 
-function send(sock: WebSocket, s: string) {
+function send(sock: WebSocket, args: any[]) {
+  let s = args.join(' ');
   console.log('SEND:', s);
   sock.send(s);
 }
@@ -190,14 +191,19 @@ function send(sock: WebSocket, s: string) {
 export function sendFieldUpdate(sock: WebSocket, num: number, board: BoardState) {
   // We always send a full update, since it is easy to compute and why not
   let update = formatFullUpdate(board);
-  send(sock, 'f ' + num + ' ' + update);
+  send(sock, ['f', num, update]);
 }
 
 export function sendSpecial(sock: WebSocket, playerNum: number,
                             target: number, special: string) {
-  send(sock, 'sb ' + target + ' ' + special + ' ' + playerNum);
+  send(sock, ['sb', target, special, playerNum]);
 }
 
+export function sendStartStop(sock: WebSocket, playerNum: number,
+                              startGame: boolean) {
+  let arg = startGame ? 1 : 0;
+  send(sock, ['startgame', arg, playerNum]);
+}
 
 export function processMessage(state: GameState, msg: MessageEvent) {
   console.log('RECV:', msg.data)

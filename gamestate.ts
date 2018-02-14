@@ -5,7 +5,7 @@ import { Piece, randomPiece, cyclePiece } from 'pieces';
 import { BOARD_HEIGHT, BOARD_WIDTH } from 'consts';
 import { COLORS, randomColor, CLEARED_COLOR, draw_square } from 'draw_util';
 import { randInt } from 'util';
-import { sendFieldUpdate, sendSpecial } from 'protocol';
+import { sendFieldUpdate, sendSpecial, sendStartStop } from 'protocol';
 
 export class GameParams {
   // See https://github.com/xale/iTetrinet/wiki/new-game-rules-string
@@ -348,7 +348,12 @@ export class GameState {
       this.newGame();
       this.start();
     }
-    if (!this.playing) return;
+    if (!this.playing) {
+      if (event.key === 'p') {
+        sendStartStop(this.sock, this.myIndex, true);
+      }
+      return;
+    }
 
     let action = true;
     if (event.key === 'ArrowUp') {

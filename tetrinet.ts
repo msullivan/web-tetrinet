@@ -27,11 +27,12 @@ params.linesPerSpecial = 1;
 params.specialsAdded = 1;
 params.specialCapacity = 30;
 params.specialFrequencies = []
+params.classicMode = true;
 for (let i = 0; i < 100; i += 1) {
   params.specialFrequencies.push(Math.floor(i/11.2));
 }
 
-let state: GameState = null;
+export let state: GameState = null;
 console.log("Loaded");
 
 let username = 'su11y';

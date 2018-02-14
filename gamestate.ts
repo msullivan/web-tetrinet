@@ -4,8 +4,9 @@ import { Special, AddLine, ClearLine, NukeField, RandomClear, SwitchField,
 import { Piece, randomPiece, cyclePiece } from 'pieces';
 import { BOARD_HEIGHT, BOARD_WIDTH } from 'consts';
 import { COLORS, randomColor, CLEARED_COLOR, draw_square } from 'draw_util';
-import { randInt } from 'util';
-import { sendFieldUpdate, sendSpecial, sendStartStop } from 'protocol';
+import { randInt, escapeHtml } from 'util';
+import { sendFieldUpdate, sendSpecial, sendStartStop, sendPlayerLost } from 'protocol';
+import { MessagePane } from 'messagepane';
 
 export class GameParams {
   // See https://github.com/xale/iTetrinet/wiki/new-game-rules-string
@@ -25,10 +26,17 @@ export class GameParams {
   classicMode: boolean;
 }
 
+enum Status {
+  Unstarted,
+  Paused,
+  Playing,
+  Dead,
+}
+
 export class GameState {
   params: GameParams;
 
-  playing: boolean;
+  status: Status;
 
   level: number;
   linesSinceLevel: number;
@@ -40,6 +48,7 @@ export class GameState {
   tickTime: number;
 
   myIndex: number;
+  username: string;
   boards: BoardState[];
 
   pendingDraw: boolean;
@@ -52,35 +61,39 @@ export class GameState {
   myBoardCanvas: HTMLCanvasElement;
   nextPieceCanvas: HTMLCanvasElement;
   specialsCanvas: HTMLCanvasElement;
+  messagePane: MessagePane;
   otherBoardCanvas: HTMLCanvasElement[];
   sock: WebSocket;
+
+  playerNames: string[];
 
   onUpdateSpecials: (x: typeof Special) => void;
 
   constructor(myIndex: number,
+              username: string,
               sock: WebSocket,
               myBoardCanvas: HTMLCanvasElement,
               nextPieceCanvas: HTMLCanvasElement,
               specialsCanvas: HTMLCanvasElement,
               otherBoardCanvas: HTMLCanvasElement[],
+              messagePane: MessagePane,
               onUpdateSpecials: (x: typeof Special) => void,
               params: GameParams) {
     this.pendingDraw = false;
 
-    this.playing = false;
-
-    this.boards = [];
-    for (let i = 0; i < 6; i += 1) {
-      this.boards.push(new BoardState(i));
-    }
-
+    this.playerNames = [];
     this.myIndex = myIndex;
+    this.username = username;
+    this.playerNames[myIndex] = username;
+
+    this.resetGame();
 
     this.sock = sock;
     this.myBoardCanvas = myBoardCanvas;
     this.otherBoardCanvas = otherBoardCanvas;
     this.nextPieceCanvas = nextPieceCanvas;
     this.specialsCanvas = specialsCanvas;
+    this.messagePane = messagePane;
 
     this.params = params;
 
@@ -90,6 +103,8 @@ export class GameState {
 
   }
 
+  playing = (): boolean => { return this.status == Status.Playing }
+
   playerBoard = (n: number): BoardState => {
     return this.boards[n-1];
   }
@@ -98,16 +113,27 @@ export class GameState {
     return this.playerBoard(this.myIndex);
   }
 
-  newGame = () => {
+  // Reset the game to a "Unstarted" state
+  resetGame = () => {
+    console.log("YOOOOO");
+    this.status = Status.Unstarted;
+
     this.tickTime = 1000;
     this.level = 0;
     this.linesSinceLevel = 0;
     this.linesSinceSpecial = 0;
     this.specials = [];
 
+    this.boards = [];
     for (let i = 0; i < 6; i += 1) {
-      this.boards[i] = new BoardState(i);
+      this.boards.push(new BoardState(i));
     }
+
+    this.nextPiece = undefined;
+  }
+
+  newGame = () => {
+    this.resetGame();
 
     this.nextPiece = randomPiece();
     this.nextOrientation = this.nextPiece.randomOrientation();
@@ -116,20 +142,53 @@ export class GameState {
   }
 
   newPiece = () => {
-    this.myBoard().newPiece(this.nextPiece, this.nextOrientation);
+    if (!this.myBoard().newPiece(this.nextPiece, this.nextOrientation)) {
+      return this.die();
+    }
     this.nextPiece = randomPiece();
     this.nextOrientation = this.nextPiece.randomOrientation();
   }
 
+  // Clear any running actions
+  halt = () => {
+    clearTimeout(this.timeoutID);
+  }
+
   start = () => {
+    this.halt();
     this.timeoutID = setTimeout(this.tick, this.tickTime);
-    this.playing = true;
+    this.status = Status.Playing;
+    this.messagePane.clearMessages();
+    this.message("The game has <b>started<b>.");
     this.requestDraw();
   }
 
+  resume = () => {
+    this.start();
+    this.message("The game has <b>resumed<b>.");
+  }
+
   pause = () => {
-    clearTimeout(this.timeoutID);
-    this.playing = false;
+    this.halt();
+    this.status = Status.Paused;
+    this.message("The game has <b>paused<b>.");
+  }
+
+  end = () => {
+    this.halt();
+    this.resetGame();
+    this.message("The game has <b>ended<b>.");
+    this.requestDraw();
+  }
+
+  private die = () => {
+    this.halt();
+    this.status = Status.Dead;
+    this.message("<b>You have lost!</b>");
+    this.myBoard().deathFill();
+    sendFieldUpdate(this.sock, this.myIndex, this.myBoard());
+    sendPlayerLost(this.sock, this.myIndex);
+    this.requestDraw();
   }
 
   private resetTimeout = () => {
@@ -137,8 +196,24 @@ export class GameState {
     this.timeoutID = setTimeout(this.tick, this.tickTime);
   }
 
+  // Player state management
+  playerName = (num: number): string => {
+    return escapeHtml(this.playerNames[num]);
+  }
+  playerJoin = (num: number, name: string) => {
+    this.playerNames[num] = name;
+  }
+  playerLeave = (num: number) => {
+    this.playerNames[num] = undefined;
+  }
+  playerWon = (num: number) => {
+    this.message("Player " + this.playerName(num) + " has won!");
+  }
+  playerLost = (num: number) => {
+    this.message("Player " + this.playerName(num) + " has lost!");
+  }
 
-
+  //
   requestDraw = () => {
     if (this.pendingDraw) { return; }
     this.pendingDraw = true;
@@ -174,7 +249,9 @@ export class GameState {
         draw_square(ctx, x, y);
       }
     }
-    this.nextPiece.draw(ctx, 3, 2, this.nextOrientation);
+    if (this.nextPiece) {
+      this.nextPiece.draw(ctx, 3, 2, this.nextOrientation);
+    }
   }
 
   private drawSpecials = (canvas: HTMLCanvasElement) => {
@@ -196,11 +273,7 @@ export class GameState {
     for (let i = 1; i <= this.boards.length; i++) {
       this.drawBoard(this.playerNumToCanvas(i), this.playerBoard(i));
     }
-
-    if (this.nextPiece) {
-      this.drawPreview(this.nextPieceCanvas);
-    }
-
+    this.drawPreview(this.nextPieceCanvas);
     this.drawSpecials(this.specialsCanvas);
 
     if (this.onUpdateSpecials !== undefined) {
@@ -210,8 +283,13 @@ export class GameState {
     this.pendingDraw = false;
   }
 
+  private message = (msg: string) => {
+    this.messagePane.addMessage(msg);
+    console.log("MSG: ", msg);
+  }
+
   private tick = () => {
-    if (!this.playing) return;
+    if (!this.playing()) return;
     let state = this.myBoard();
 
     if (!state.move(0, 1)) {
@@ -372,16 +450,17 @@ export class GameState {
     let state = this.myBoard();
 
     if (this.debugMode && event.key == 's') {
-      if (this.playing) this.pause();
+      if (this.playing()) this.pause();
       this.newGame();
       this.start();
     }
-    if (!this.playing) {
+    if (this.status == Status.Unstarted) {
       if (event.key === 'p') {
         sendStartStop(this.sock, this.myIndex, true);
       }
       return;
     }
+    if (!this.playing()) return;
 
     let action = true;
     if (event.key === 'ArrowUp') {

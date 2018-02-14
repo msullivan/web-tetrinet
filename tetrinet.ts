@@ -4,12 +4,14 @@ import { connectAndHandshake, processMessage } from 'protocol';
 import { sizeCanvasForBoard } from 'draw_util';
 import { Special } from 'specials';
 import { randInt } from 'util';
+import { MessagePane } from 'messagepane';
 
 let mainCanvas = document.getElementById('canvas') as HTMLCanvasElement;
 sizeCanvasForBoard(mainCanvas);
 
 let nextPieceCanvas = document.getElementById('preview') as HTMLCanvasElement;
 let specialsCanvas = document.getElementById('specials') as HTMLCanvasElement;
+let messagesDiv = document.getElementById('messages') as HTMLDivElement;
 
 let otherCanvases: HTMLCanvasElement[] = [];
 let OTHER_SCALE = 0.5;
@@ -55,11 +57,13 @@ connectAndHandshake(
   username,
   (playerNum: number, sock: WebSocket) => {
     state = new GameState(playerNum,
+                          username,
                           sock,
                           mainCanvas,
                           nextPieceCanvas,
                           specialsCanvas,
                           otherCanvases,
+                          new MessagePane(messagesDiv),
                           onUpdateSpecials,
                           params);
     document.addEventListener('keydown', state.onKeyDown);

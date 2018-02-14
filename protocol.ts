@@ -120,7 +120,6 @@ function specialUsed(state: GameState,
 function newGame(state: GameState, cmd: string[]) {
   // TODO: handle the rules string
   // https://github.com/xale/iTetrinet/wiki/new-game-rules-string
-  state.pause();
   state.newGame();
   state.start();
 }
@@ -129,13 +128,8 @@ function pauseGame(state: GameState, pause: number) {
   if (pause) {
     state.pause();
   } else {
-    state.start();
+    state.resume();
   }
-}
-
-function endGame(state: GameState) {
-  // TODO: something more aggressive
-  state.pause();
 }
 
 ///////////////////////////
@@ -199,6 +193,10 @@ export function sendSpecial(sock: WebSocket, playerNum: number,
   send(sock, ['sb', target, special, playerNum]);
 }
 
+export function sendPlayerLost(sock: WebSocket, playerNum: number) {
+  send(sock, ['playerlost', playerNum]);
+}
+
 export function sendStartStop(sock: WebSocket, playerNum: number,
                               startGame: boolean) {
   let arg = startGame ? 1 : 0;
@@ -218,7 +216,15 @@ export function processMessage(state: GameState, msg: MessageEvent) {
   } else if (cmd[0] == 'pause') {
     pauseGame(state, parseInt(cmd[1]));
   } else if (cmd[0] == 'endgame') {
-    endGame(state);
+    state.end();
+  } else if (cmd[0] == 'playerjoin') {
+    state.playerJoin(parseInt(cmd[1]), cmd[2]);
+  } else if (cmd[0] == 'playerleave') {
+    state.playerLeave(parseInt(cmd[1]));
+  } else if (cmd[0] == 'playerwon') {
+    state.playerWon(parseInt(cmd[1]));
+  } else if (cmd[0] == 'playerlost') {
+    state.playerLost(parseInt(cmd[1]));
   }
 
 }

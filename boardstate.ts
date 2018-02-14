@@ -164,17 +164,27 @@ export class BoardState {
     return [count, specials];
   }
 
-  newPiece = (piece: Piece, orientation: number) => {
+  newPiece = (piece: Piece, orientation: number): boolean => {
     this.x = INITIAL_X;
     this.y = 0;
     this.piece = piece;
     this.orientation = orientation;
+
+    return this.move(0, 0);
   }
 
   freeze = () => {
     const shape = this.curShape();
     for (let coord of shape.coords) {
       this.board[coord[0] + this.x][coord[1] + this.y] = new Cell(this.piece.color, undefined);
+    }
+  }
+
+  deathFill = () => {
+    for (let x = 0; x < BOARD_WIDTH; x += 1) {
+      for (let y = 0; y < BOARD_HEIGHT; y += 1) {
+        this.board[x][y] = new Cell(randomColor(), undefined);
+      }
     }
   }
 }

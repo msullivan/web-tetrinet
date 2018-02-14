@@ -1,5 +1,4 @@
 'use strict';
-// npm install net ws carrier connect serve-static yargs
 
 const args = require('yargs').argv;
 

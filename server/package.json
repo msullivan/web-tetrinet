@@ -1,0 +1,28 @@
+{
+  "name": "tetrinet-proxy",
+  "version": "0.1.0",
+  "description": "Proxy server for web-tetrinet",
+  "main": "proxy.js",
+  "dependencies": {
+    "carrier": "^0.3.0",
+    "connect": "^3.6.5",
+    "serve-static": "^1.13.2",
+    "net": "^1.0.2",
+    "ws": "^4.0.0",
+    "yargs": "^11.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/msullivan/web-tetrinet.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/msullivan/web-tetrinet/issues"
+  },
+  "homepage": "https://github.com/msullivan/web-tetrinet#readme"
+}

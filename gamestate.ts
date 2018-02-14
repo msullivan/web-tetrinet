@@ -232,7 +232,11 @@ export class GameState {
           this.params.specialsAdded;
     this.linesSinceSpecial %= this.params.linesPerSpecial;
 
-    this.addSpecials(specialsToAdd);
+    if (specialsToAdd > 0) {
+      this.addSpecials(specialsToAdd);
+      // Rarely, a new line can be created by adding specials.
+      this.removeLines();
+    }
 
     for (let special of specialsRemoved) {
       if (this.specials.length >= this.params.specialCapacity) { break; }
@@ -242,13 +246,12 @@ export class GameState {
       }
     }
 
-    // TODO: tell the server we removed lines.
+    sendFieldUpdate(this.sock, this.myIndex, this.myBoard());
   }
 
   private freeze = () => {
     this.myBoard().freeze();
     this.removeLines();
-    sendFieldUpdate(this.sock, this.myIndex, this.myBoard());
   }
 
   applySpecial = (special: typeof Special, fromPlayer: number) => {
@@ -258,6 +261,8 @@ export class GameState {
       this.freeze();
       this.newPiece();
     }
+
+    this.removeLines();
   }
 
   onKeyDown = (event: any) => {

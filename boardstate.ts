@@ -21,7 +21,6 @@ export class Cell {
       ctx.font = '30px Arial';
       ctx.fillStyle = 'rgb(0, 0, 0)';
       draw_text(ctx, x, y, this.special.identifier);
-      console.log(this.special);
     }
   }
 

@@ -2,7 +2,8 @@
   "compilerOptions": {
     "module": "amd",
     "sourceMap": true,
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "target": "es6"
   },
   "files": [
     "consts.ts",

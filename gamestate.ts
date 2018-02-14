@@ -5,7 +5,7 @@ import { Piece, randomPiece } from 'pieces';
 import { BOARD_HEIGHT, BOARD_WIDTH } from 'consts';
 import { COLORS, randomColor, CLEARED_COLOR, draw_square } from 'draw_util';
 import { randInt } from 'util';
-import { sendFieldUpdate } from 'protocol';
+import { sendFieldUpdate, sendSpecial } from 'protocol';
 
 export class GameParams {
   // See https://github.com/xale/iTetrinet/wiki/new-game-rules-string
@@ -288,6 +288,10 @@ export class GameState {
     }
 
     sendFieldUpdate(this.sock, this.myIndex, this.myBoard());
+    if (linesRemoved > 1 && this.params.classicMode) {
+      let num = linesRemoved == 4 ? 4 : linesRemoved-1;
+      sendSpecial(this.sock, this.myIndex, 0, 'cs'+num);
+    }
   }
 
   private freeze = () => {
@@ -304,6 +308,7 @@ export class GameState {
     }
 
     this.removeLines();
+    this.requestDraw();
   }
 
   onKeyDown = (event: any) => {

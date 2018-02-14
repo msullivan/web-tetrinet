@@ -1,5 +1,5 @@
 import { BOARD_WIDTH, BOARD_HEIGHT } from "consts";
-import { SPECIALS, Special } from 'specials';
+import { SPECIALS, Special, ClassicAddLine } from 'specials';
 import { GameState } from 'gamestate';
 import { BoardState, Cell } from 'boardstate';
 
@@ -101,6 +101,22 @@ function fieldUpdate(state: GameState, player: number, fieldstring: string) {
   state.requestDraw();
 }
 
+function specialUsed(state: GameState,
+                     target: number, typ: string, sender: number) {
+  let special = special_map[typ];
+  if (target == state.myIndex && special !== undefined) {
+    state.applySpecial(special, sender);
+  }
+  if (target == 0 && typ.startsWith("cs")) {
+    // This is kind of ugly
+    let cnt = parseInt(typ.substr(2));
+    for (let i = 0; i < cnt; i++) {
+      state.applySpecial(ClassicAddLine, sender);
+    }
+  }
+}
+
+
 function newGame(state: GameState, cmd: string[]) {
   // TODO: handle the rules string
   // https://github.com/xale/iTetrinet/wiki/new-game-rules-string
@@ -165,11 +181,22 @@ export function connectAndHandshake(
 }
 //
 
+function send(sock: WebSocket, s: string) {
+  console.log('SEND:', s);
+  sock.send(s);
+}
+
 export function sendFieldUpdate(sock: WebSocket, num: number, board: BoardState) {
   // We always send a full update, since it is easy to compute and why not
   let update = formatFullUpdate(board);
-  sock.send('f ' + num + ' ' + update);
+  send(sock, 'f ' + num + ' ' + update);
 }
+
+export function sendSpecial(sock: WebSocket, playerNum: number,
+                            target: number, special: string) {
+  send(sock, 'sb ' + target + ' ' + special + ' ' + playerNum);
+}
+
 
 export function processMessage(state: GameState, msg: MessageEvent) {
   console.log('RECV:', msg.data)
@@ -177,6 +204,8 @@ export function processMessage(state: GameState, msg: MessageEvent) {
 
   if (cmd[0] == 'f') {
     fieldUpdate(state, parseInt(cmd[1]), cmd[2]);
+  } else if (cmd[0] == 'sb') {
+    specialUsed(state, parseInt(cmd[1]), cmd[2], parseInt(cmd[3]));
   } else if (cmd[0] == 'newgame') {
     newGame(state, cmd);
   } else if (cmd[0] == 'pause') {

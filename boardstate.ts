@@ -123,12 +123,15 @@ export class BoardState {
 
   removeLine = (lineNo: number): (typeof Special)[] => {
     let specials: (typeof Special)[] = [];
+    for (let x = 0; x < BOARD_WIDTH; x += 1) {
+      if (this.board[x][lineNo] !== undefined &&
+          this.board[x][lineNo].special !== undefined) {
+        specials.push(this.board[x][lineNo].special);
+      }
+    }
+
     for (; lineNo > 0; lineNo -= 1) {
       for (let x = 0; x < BOARD_WIDTH; x += 1) {
-        if (this.board[x][lineNo] !== undefined &&
-            this.board[x][lineNo].special !== undefined) {
-          specials.push(this.board[x][lineNo].special);
-        }
         this.board[x][lineNo] = this.board[x][lineNo - 1];
       }
     }

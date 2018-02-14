@@ -91,7 +91,7 @@ export class SwitchField extends Special {
   static desc = "Switch fields";
 
   static apply = (state: GameState, sourcePlayer: number) => {
-    const theirBoard = state.boards[sourcePlayer];
+    const theirBoard = state.playerBoard(sourcePlayer);
     const myBoard = state.myBoard();
 
     for (let x = 0; x < BOARD_WIDTH; x += 1) {

@@ -104,6 +104,7 @@ export class GameState {
     this.level = 0;
     this.linesSinceLevel = 0;
     this.linesSinceSpecial = 0;
+    this.specials = [];
 
     for (let i = 0; i < 6; i += 1) {
       this.boards[i] = new BoardState(i);
@@ -302,12 +303,6 @@ export class GameState {
           this.params.specialsAdded;
     this.linesSinceSpecial %= this.params.linesPerSpecial;
 
-    if (specialsToAdd > 0) {
-      this.addSpecials(specialsToAdd);
-      // Rarely, a new line can be created by adding specials.
-      this.removeLines();
-    }
-
     for (let special of specialsRemoved) {
       if (this.specials.length >= this.params.specialCapacity) { break; }
       for (let i = 0; i < linesRemoved; i += 1) {
@@ -320,6 +315,43 @@ export class GameState {
     if (linesRemoved > 1 && this.params.classicMode) {
       let num = linesRemoved == 4 ? 4 : linesRemoved-1;
       sendSpecial(this.sock, this.myIndex, 0, 'cs'+num);
+    }
+
+    if (specialsToAdd > 0) {
+      this.addSpecials(specialsToAdd);
+      // Rarely, a new line can be created by adding specials.
+      this.removeLines();
+    }
+  }
+
+  private sendSpecial = (playerNum: number) => {
+    if (playerNum === 0 || playerNum > 6) { return; }
+    if (this.specials.length === 0) { return; }
+
+    let serverNum;
+    if (playerNum === 1) {
+      serverNum = this.myIndex;
+    } else {
+      if (playerNum > this.myIndex) {
+        serverNum = playerNum;
+      } else {
+        serverNum = playerNum - 1;
+      }
+    }
+
+    let special = this.specials.shift();
+
+    sendSpecial(this.sock, this.myIndex, serverNum,
+                special.identifier.toLowerCase());
+
+    if (playerNum === 1) {
+      // We're applying the special to ourselves. The server doesn't echo it, so we need
+      // to apply it here.
+      special.apply(this, this.myIndex);
+    } else if (special === SwitchField) {
+      // If we switch fields with someone else, we need to apply the change to our board too.
+      // It's symmetric, so we can pretend it was the other player applying it to us.
+      special.apply(this, serverNum);
     }
   }
 
@@ -373,6 +405,12 @@ export class GameState {
       this.freeze();
       this.newPiece();
       this.resetTimeout();
+    } else if (event.key === 'd') {
+      this.specials.shift();
+      this.requestDraw();
+    } else if (!isNaN(event.key)) {
+      let num = parseInt(event.key);
+      this.sendSpecial(num);
     } else if (this.debugMode) {
       if (event.key === 'a') {
         this.applySpecial(AddLine, 0);
@@ -388,6 +426,8 @@ export class GameState {
         this.applySpecial(RandomClear, 0);
       } else if (event.key === 'o') {
         this.applySpecial(BlockBomb, 0);
+      } else if (event.key === 'b') {
+        this.applySpecial(ClearSpecials, 0);
       } else if (event.key === 'i') {
         this.nextPiece = cyclePiece(this.nextPiece);
       } else {

@@ -207,7 +207,7 @@ export class BlockBomb extends Special {
     for (let x = 0; x < BOARD_WIDTH; x += 1) {
       for (let y = 0; y < BOARD_HEIGHT; y += 1) {
         const cell = myBoard.board[x][y];
-        if (cell.special == BlockBomb) {
+        if (cell !== undefined && cell.special === BlockBomb) {
           bombLocations.push([x, y]);
         }
       }

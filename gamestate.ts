@@ -73,8 +73,6 @@ export class GameState {
 
     this.myIndex = myIndex;
 
-    this.myBoard().newPiece(randomPiece(), randomColor(), 0);
-
     this.sock = sock;
     this.myBoardCanvas = myBoardCanvas;
     this.otherBoardCanvas = otherBoardCanvas;
@@ -169,18 +167,19 @@ export class GameState {
       this.drawBoard(this.playerNumToCanvas(i), this.playerBoard(i));
     }
 
-    let nextPieceCtx = this.nextPieceCanvas.getContext('2d', { alpha: false });
-    nextPieceCtx.fillStyle = 'rgb(0, 0, 0)';
-    nextPieceCtx.fillRect(0, 0, this.nextPieceCanvas.width, this.nextPieceCanvas.height);
-    nextPieceCtx.fillStyle = CLEARED_COLOR;
-    for (let x = 0; x < 6; x += 1) {
-      for (let y = 0; y < 6; y += 1) {
-        draw_square(nextPieceCtx, x, y);
+    if (this.nextPiece) {
+      let nextPieceCtx = this.nextPieceCanvas.getContext('2d', { alpha: false });
+      nextPieceCtx.fillStyle = 'rgb(0, 0, 0)';
+      nextPieceCtx.fillRect(0, 0, this.nextPieceCanvas.width, this.nextPieceCanvas.height);
+      nextPieceCtx.fillStyle = CLEARED_COLOR;
+      for (let x = 0; x < 6; x += 1) {
+        for (let y = 0; y < 6; y += 1) {
+          draw_square(nextPieceCtx, x, y);
+        }
       }
+      nextPieceCtx.fillStyle = COLORS[this.nextColor];
+      this.nextPiece.draw(nextPieceCtx, 3, 2, this.nextOrientation);
     }
-    nextPieceCtx.fillStyle = COLORS[this.nextColor];
-    this.nextPiece.draw(nextPieceCtx, 3, 2, this.nextOrientation);
-
 
     this.pendingDraw = false;
   }
@@ -348,6 +347,8 @@ export class GameState {
         this.applySpecial(NukeField, 0);
       } else if (event.key === 'r') {
         this.applySpecial(RandomClear, 0);
+      } else if (event.key === 'o') {
+        this.applySpecial(BlockBomb, 0);
       } else {
         action = false;
       }

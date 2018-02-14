@@ -3,7 +3,7 @@ import { Special, AddLine, ClearLine, NukeField, RandomClear, SwitchField,
          ClearSpecials, Gravity, QuakeField, BlockBomb, randomSpecial } from 'specials';
 import { Piece, randomPiece } from 'pieces';
 import { BOARD_HEIGHT, BOARD_WIDTH } from 'consts';
-import { randomColor } from 'draw_util';
+import { COLORS, randomColor, CLEARED_COLOR, draw_square } from 'draw_util';
 import { randInt } from 'util';
 import { sendFieldUpdate } from 'protocol';
 
@@ -45,6 +45,8 @@ export class GameState {
   pendingDraw: boolean;
 
   nextPiece: Piece;
+  nextOrientation: number;
+  nextColor: number;
 
   debugMode: boolean;
 
@@ -71,6 +73,8 @@ export class GameState {
 
     this.myIndex = myIndex;
 
+    this.myBoard().newPiece(randomPiece(), randomColor(), 0);
+
     this.sock = sock;
     this.myBoardCanvas = myBoardCanvas;
     this.otherBoardCanvas = otherBoardCanvas;
@@ -79,8 +83,9 @@ export class GameState {
 
     this.specials = [];
 
+    this.nextPieceCanvas = nextPieceCanvas;
+
     // TODO:
-    //this.nextPieceCtx = nextPieceCtx;
     //this.otherBoardCtx = otherBoardCtx;
   }
 
@@ -103,13 +108,17 @@ export class GameState {
     }
 
     this.nextPiece = randomPiece();
+    this.nextOrientation = this.nextPiece.randomOrientation();
+    this.nextColor = randomColor();
 
-    this.myBoard().newPiece(randomPiece());
+    this.myBoard().newPiece(randomPiece(), randomColor(), 0);
   }
 
   newPiece = () => {
-    this.myBoard().newPiece(this.nextPiece);
+    this.myBoard().newPiece(this.nextPiece, this.nextColor, this.nextOrientation);
     this.nextPiece = randomPiece();
+    this.nextOrientation = this.nextPiece.randomOrientation();
+    this.nextColor = randomColor();
   }
 
   start = () => {
@@ -134,7 +143,6 @@ export class GameState {
     if (this.pendingDraw) { return; }
     this.pendingDraw = true;
     requestAnimationFrame(this.draw);
-
   }
 
   private playerNumToCanvas(i: number): HTMLCanvasElement {
@@ -160,6 +168,19 @@ export class GameState {
     for (let i = 1; i <= this.boards.length; i++) {
       this.drawBoard(this.playerNumToCanvas(i), this.playerBoard(i));
     }
+
+    let nextPieceCtx = this.nextPieceCanvas.getContext('2d', { alpha: false });
+    nextPieceCtx.fillStyle = 'rgb(0, 0, 0)';
+    nextPieceCtx.fillRect(0, 0, this.nextPieceCanvas.width, this.nextPieceCanvas.height);
+    nextPieceCtx.fillStyle = CLEARED_COLOR;
+    for (let x = 0; x < 6; x += 1) {
+      for (let y = 0; y < 6; y += 1) {
+        draw_square(nextPieceCtx, x, y);
+      }
+    }
+    nextPieceCtx.fillStyle = COLORS[this.nextColor];
+    this.nextPiece.draw(nextPieceCtx, 3, 2, this.nextOrientation);
+
 
     this.pendingDraw = false;
   }

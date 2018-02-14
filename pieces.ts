@@ -1,5 +1,5 @@
 import { draw_square } from 'draw_util';
-import { randInt} from 'util';
+import { randInt } from 'util';
 
 export class Shape {
   coords: number[][];
@@ -24,6 +24,10 @@ export class Piece {
   draw(ctx: CanvasRenderingContext2D, x: number, y: number, orientation: number) {
     const shape = this.shapes[orientation % this.shapes.length];
     shape.draw(ctx, x, y);
+  }
+
+  randomOrientation = () => {
+    return randInt(this.shapes.length);
   }
 }
 

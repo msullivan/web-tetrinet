@@ -6,10 +6,13 @@ import { sizeCanvasForBoard } from 'draw_util';
 let mainCanvas = document.getElementById('canvas') as HTMLCanvasElement;
 sizeCanvasForBoard(mainCanvas);
 
+let nextPieceCanvas = document.getElementById('preview') as HTMLCanvasElement;
+
 let otherCanvases: HTMLCanvasElement[] = [];
 let OTHER_SCALE = 0.5;
 for (let i = 0; i < 5; i++) {
   let canvas = document.createElement('canvas') as HTMLCanvasElement;
+  canvas.className = 'canvas-' + i.toString();
   sizeCanvasForBoard(canvas, 0.5);
   const ctx = canvas.getContext('2d', { alpha: false });
   ctx.scale(OTHER_SCALE, OTHER_SCALE);
@@ -38,7 +41,7 @@ connectAndHandshake(
     state = new GameState(playerNum,
                           sock,
                           mainCanvas,
-                          null,
+                          nextPieceCanvas,
                           otherCanvases,
                           params);
     document.addEventListener('keydown', state.onKeyDown);

@@ -1,5 +1,6 @@
 import { BOARD_WIDTH, BOARD_HEIGHT, INITIAL_X } from "consts";
-import { draw_square, COLORS, randomColor, CLEARED_COLOR, draw_text } from "draw_util";
+import { draw_square, COLORS, randomColor, CLEARED_COLOR, SPECIAL_COLOR,
+         draw_text } from "draw_util";
 import { Shape, Piece, randomPiece } from "pieces";
 import { randInt } from "util";
 import { Special } from "specials";
@@ -14,7 +15,11 @@ export class Cell {
   }
 
   draw = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
-    ctx.fillStyle = COLORS[this.color];
+    if (this.special !== undefined) {
+      ctx.fillStyle = SPECIAL_COLOR;
+    } else {
+      ctx.fillStyle = COLORS[this.color];
+    }
     draw_square(ctx, x, y);
 
     if (this.special !== undefined) {
@@ -158,12 +163,12 @@ export class BoardState {
     return [count, specials];
   }
 
-  newPiece = (piece: Piece) => {
+  newPiece = (piece: Piece, color: number, orientation: number) => {
     this.x = INITIAL_X;
     this.y = 0;
-    this.color = randomColor();
+    this.color = color;
     this.piece = piece;
-    this.orientation = randInt(this.piece.shapes.length);
+    this.orientation = orientation;
   }
 
   freeze = () => {

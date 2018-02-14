@@ -1,0 +1,56 @@
+canvas {
+    position: fixed;
+}
+
+canvas.canvas-0 {
+    left: 600px;
+}
+
+canvas.canvas-1 {
+    left: 800px;
+}
+
+canvas.canvas-2 {
+    left: 1000px;
+}
+
+canvas.canvas-3 {
+    left: 800px;
+    top:  400px;
+}
+
+canvas.canvas-4 {
+    left: 1000px;
+    top:  400px;
+}
+
+canvas.preview {
+    left: 400px;
+    width: 150px;
+    background: black;
+}
+
+canvas.specials {
+    top: 750px;
+    width: 600px;
+    height: 30px;
+    left: 100px;
+}
+
+div.specials-caption {
+    position: fixed;
+    top: 750px;
+    height: 30px;
+    line-height: 30px;
+    width: 100px;
+    overflow: hidden;
+}
+
+div.messages {
+    position: fixed;
+    top: 400px;
+    left: 400px;
+    width: 390px;
+    height: 350px;
+    overflow-y: scroll;
+}

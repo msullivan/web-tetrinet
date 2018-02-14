@@ -18,19 +18,19 @@ export function draw_text(ctx: CanvasRenderingContext2D, x: number, y: number,
 
 export const COLORS: string[] = [
   undefined,
-  'rgb(255, 0, 0)',
-  'rgb(0, 255, 0)',
-  'rgb(0, 0, 255)',
-  'rgb(255, 255, 0)',
-  'rgb(255, 0, 255)',
+  'rgb(150, 0, 0)',
+  'rgb(0, 150, 0)',
+  'rgb(0, 0, 150)',
+  'rgb(150, 150, 0)',
+  'rgb(150, 0, 150)',
 ];
 
 export function randomColor(): number {
   return 1 + randInt(COLORS.length - 1);
 }
 
-export const CLEARED_COLOR = 'rgb(200, 200, 200)';
-
+export const CLEARED_COLOR = 'rgb(230, 230, 230)';
+export const SPECIAL_COLOR = 'rgb(200, 200, 200)';
 
 export function sizeCanvasForBoard(canvas: HTMLCanvasElement, scale = 1.0) {
   canvas.width = scale * (SQUARE_SIZE * BOARD_WIDTH + GAP * (BOARD_WIDTH + 1));

@@ -28,6 +28,8 @@ export class GameParams {
 export class GameState {
   params: GameParams;
 
+  playing: boolean;
+
   level: number;
   linesSinceLevel: number;
   linesSinceSpecial: number;
@@ -58,11 +60,9 @@ export class GameState {
               nextPieceCanvas: HTMLCanvasElement,
               otherBoardCanvas: HTMLCanvasElement[],
               params: GameParams) {
-    this.tickTime = 1000;
-    this.level = 0;
-    this.linesSinceLevel = 0;
-    this.linesSinceSpecial = 0;
     this.pendingDraw = false;
+
+    this.playing = false;
 
     this.boards = [];
     for (let i = 0; i < 6; i += 1) {
@@ -70,9 +70,6 @@ export class GameState {
     }
 
     this.myIndex = myIndex;
-    this.nextPiece = randomPiece();
-
-    this.myBoard().newPiece(randomPiece());
 
     this.sock = sock;
     this.myBoardCanvas = myBoardCanvas;
@@ -95,6 +92,21 @@ export class GameState {
     return this.playerBoard(this.myIndex);
   }
 
+  newGame = () => {
+    this.tickTime = 1000;
+    this.level = 0;
+    this.linesSinceLevel = 0;
+    this.linesSinceSpecial = 0;
+
+    for (let i = 0; i < 6; i += 1) {
+      this.boards[i] = new BoardState(i);
+    }
+
+    this.nextPiece = randomPiece();
+
+    this.myBoard().newPiece(randomPiece());
+  }
+
   newPiece = () => {
     this.myBoard().newPiece(this.nextPiece);
     this.nextPiece = randomPiece();
@@ -102,13 +114,21 @@ export class GameState {
 
   start = () => {
     this.timeoutID = setTimeout(this.tick, this.tickTime);
+    this.playing = true;
     this.requestDraw();
+  }
+
+  pause = () => {
+    clearTimeout(this.timeoutID);
+    this.playing = false;
   }
 
   private resetTimeout = () => {
     clearTimeout(this.timeoutID);
     this.timeoutID = setTimeout(this.tick, this.tickTime);
   }
+
+
 
   requestDraw = () => {
     if (this.pendingDraw) { return; }
@@ -145,6 +165,7 @@ export class GameState {
   }
 
   private tick = () => {
+    if (!this.playing) return;
     let state = this.myBoard();
 
     if (!state.move(0, 1)) {
@@ -267,6 +288,13 @@ export class GameState {
 
   onKeyDown = (event: any) => {
     let state = this.myBoard();
+
+    if (this.debugMode && event.key == 's') {
+      if (this.playing) this.pause();
+      this.newGame();
+      this.start();
+    }
+    if (!this.playing) return;
 
     let action = true;
     if (event.key === 'ArrowUp') {

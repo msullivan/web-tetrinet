@@ -101,6 +101,27 @@ function fieldUpdate(state: GameState, player: number, fieldstring: string) {
   state.requestDraw();
 }
 
+function newGame(state: GameState, cmd: string[]) {
+  // TODO: handle the rules string
+  // https://github.com/xale/iTetrinet/wiki/new-game-rules-string
+  state.pause();
+  state.newGame();
+  state.start();
+}
+
+function pauseGame(state: GameState, pause: number) {
+  if (pause) {
+    state.pause();
+  } else {
+    state.start();
+  }
+}
+
+function endGame(state: GameState) {
+  // TODO: something more aggressive
+  state.pause();
+}
+
 ///////////////////////////
 // The proxy "protocol" has an extra round trip in it so the caller needs
 // to set up its onmessage handler in its onopen handler.
@@ -156,6 +177,12 @@ export function processMessage(state: GameState, msg: MessageEvent) {
 
   if (cmd[0] == 'f') {
     fieldUpdate(state, parseInt(cmd[1]), cmd[2]);
+  } else if (cmd[0] == 'newgame') {
+    newGame(state, cmd);
+  } else if (cmd[0] == 'pause') {
+    pauseGame(state, parseInt(cmd[1]));
+  } else if (cmd[0] == 'endgame') {
+    endGame(state);
   }
 
 }

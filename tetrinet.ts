@@ -43,7 +43,7 @@ connectAndHandshake(
                           params);
     document.addEventListener('keydown', state.onKeyDown);
     state.debugMode = true;
-    state.start();
+    state.requestDraw();
     sock.onmessage = (msg) => { processMessage(state, msg) };
   }
 );

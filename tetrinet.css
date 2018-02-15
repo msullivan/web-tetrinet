@@ -1,7 +1,3 @@
-body {
-    height: 90vh;
-}
-
 .hidden {
     display: none;
 }
@@ -106,14 +102,10 @@ div.messages {
     overflow-y: scroll;
 }
 
-div.lobby {
-    height: 90%;
-}
-
 /* Chat/lobby view */
 div.chat {
     width: 700px;
-    height: 90%;
+    height: 90vh;
     overflow-y: scroll;
 }
 

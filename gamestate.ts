@@ -524,6 +524,8 @@ export class GameState {
       // It's symmetric, so we can pretend it was the other player applying it to us.
       special.apply(this, serverNum);
     }
+
+    sendFieldUpdate(this.sock, this.myIndex, this.myBoard());
   }
 
   private freeze = () => {

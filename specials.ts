@@ -70,7 +70,7 @@ let classicAddLinesN = (n: number) => {
   return ClassicAddLineN;
 }
 export let classicAddLines: typeof Special[] = []
-for (let i = 2; i <= 4; i++) {
+for (let i = 1; i <= 4; i++) {
   classicAddLines[i] = classicAddLinesN(i);
 }
 

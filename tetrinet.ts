@@ -65,7 +65,6 @@ function connectServer(username: string) {
       document.addEventListener('keydown', state.onKeyDown);
       document.getElementById('chat-input').addEventListener('keyup',
                                                              state.onChatKey);
-      state.debugMode = true;
       state.requestDraw();
       sock.onmessage = (msg) => { processMessage(state, msg) };
     }

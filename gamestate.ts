@@ -660,9 +660,14 @@ export class GameState {
   onChatKey = (event: any) => {
     if (event.keyCode === 13) {
       let element = document.getElementById('chat-input') as HTMLInputElement;
-      sendChatMessage(this.sock, this.myIndex, element.value);
-      if (element.value[0] !== '/') {
-        this.receiveChat(this.myIndex, element.value);
+      let msg = element.value;
+      if (msg == '/xyzzy') {
+        msg = "*** DEBUG MODE ENABLED ***";
+        this.debugMode = true;
+      }
+      sendChatMessage(this.sock, this.myIndex, msg);
+      if (msg[0] !== '/') {
+        this.receiveChat(this.myIndex, msg);
       }
       element.value = '';
     }

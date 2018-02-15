@@ -43,7 +43,7 @@ export class GameState {
   status: Status;
 
   level: number;
-  linesSinceLevel: number;
+  linesRemoved: number;
   linesSinceSpecial: number;
 
   specials: (typeof Special)[];
@@ -117,13 +117,23 @@ export class GameState {
     return this.playerBoard(this.myIndex);
   }
 
+  updateLevel = () => {
+    if (this.params === undefined) { return; }
+    const level = Math.floor(this.linesRemoved / this.params.linesPerLevel) *
+          this.params.levelIncrement +
+          this.params.startingLevel;
+    console.log(level);
+    document.getElementById('level-display').innerText = level.toString();
+    this.tickTime = Math.max(1005 - level * 10);
+  }
+
   // Reset the game to a "Unstarted" state
   resetGame = () => {
     this.status = Status.Unstarted;
 
-    this.tickTime = 1000;
+    this.tickTime = 1005;
     this.level = 0;
-    this.linesSinceLevel = 0;
+    this.linesRemoved = 0;
     this.linesSinceSpecial = 0;
     this.specials = [];
     this.activePlayers = [];
@@ -136,6 +146,8 @@ export class GameState {
     }
 
     this.nextPiece = undefined;
+
+    this.updateLevel();
   }
 
   newGame = () => {
@@ -452,6 +464,7 @@ export class GameState {
     const [linesRemoved, specialsRemoved] = this.myBoard().removeLines();
 
     this.linesSinceSpecial += linesRemoved;
+    this.linesRemoved += linesRemoved;
 
     const specialsToAdd = Math.floor(this.linesSinceSpecial / this.params.linesPerSpecial) *
           this.params.specialsAdded;
@@ -477,6 +490,8 @@ export class GameState {
       // Rarely, a new line can be created by adding specials.
       this.removeLines();
     }
+
+    this.updateLevel();
   }
 
   private localToServerNumber = (playerNum: number) => {

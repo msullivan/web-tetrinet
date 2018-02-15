@@ -35,6 +35,9 @@ params.specialsAdded = 1;
 params.specialCapacity = 30;
 params.specialFrequencies = []
 params.classicMode = true;
+params.linesPerLevel = 1;
+params.levelIncrement = 1;
+params.startingLevel = 0;
 for (let i = 0; i < 100; i += 1) {
   params.specialFrequencies.push(Math.floor(i/11.2));
 }

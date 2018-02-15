@@ -102,6 +102,12 @@ div.messages {
     overflow-y: scroll;
 }
 
+div.level-box {
+    position: fixed;
+    left: 400px;
+    top: 200px;
+}
+
 /* Chat/lobby view */
 div.chat {
     width: 700px;

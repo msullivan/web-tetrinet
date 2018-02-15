@@ -13,7 +13,7 @@ export abstract class Special {
 
 export class AddLine extends Special {
   static identifier = "A";
-  static desc = "Add line";
+  static desc = "Add Line";
 
   static apply = (state: GameState, sourcePlayer: number) => {
     const board = state.myBoard();
@@ -38,36 +38,45 @@ export class AddLine extends Special {
   }
 }
 
-export class ClassicAddLine extends Special {
-  // Note: this is not a special in the same sense as the others. This is used to
-  // add lines that result from someone else clearing lines, and is easiest to treat
-  // as if it were a special.
-  static identifier: string = undefined;
-  static desc: string = undefined;
+let classicAddLinesN = (n: number) => {
+  class ClassicAddLineN extends Special {
+    static desc = n + " Lines Added";
 
-  static apply = (state: GameState, sourcePlayer: number) => {
-    const board = state.myBoard();
-    for (let y = 0; y < BOARD_HEIGHT - 1; y += 1) {
+    static applyOnce = (state: GameState, sourcePlayer: number) => {
+      const board = state.myBoard();
+      for (let y = 0; y < BOARD_HEIGHT - 1; y += 1) {
+        for (let x = 0; x < BOARD_WIDTH; x += 1) {
+          board.board[x][y] = board.board[x][y+1];
+        }
+      }
+
+      const randomTile = (): Cell => {
+        return new Cell(randomColor(), undefined);
+      };
+
       for (let x = 0; x < BOARD_WIDTH; x += 1) {
-        board.board[x][y] = board.board[x][y+1];
+        board.board[x][BOARD_HEIGHT - 1] = randomTile();
+      }
+
+      board.board[randInt(BOARD_WIDTH)][BOARD_HEIGHT - 1] = undefined;
+    }
+
+    static apply = (state: GameState, sourcePlayer: number) => {
+      for (let i = 0; i < n; i++) {
+        ClassicAddLineN.applyOnce(state, sourcePlayer);
       }
     }
-
-    const randomTile = (): Cell => {
-      return new Cell(randomColor(), undefined);
-    };
-
-    for (let x = 0; x < BOARD_WIDTH; x += 1) {
-      board.board[x][BOARD_HEIGHT - 1] = randomTile();
-    }
-
-    board.board[randInt(BOARD_WIDTH)][BOARD_HEIGHT - 1] = undefined;
   }
+  return ClassicAddLineN;
+}
+export let classicAddLines: typeof Special[] = []
+for (let i = 2; i <= 4; i++) {
+  classicAddLines[i] = classicAddLinesN(i);
 }
 
 export class ClearLine extends Special {
   static identifier = "C";
-  static desc = "Clear line";
+  static desc = "Clear Line";
 
   static apply = (state: GameState, sourcePlayer: number) => {
     state.myBoard().removeLine(BOARD_HEIGHT - 1);
@@ -76,7 +85,7 @@ export class ClearLine extends Special {
 
 export class RandomClear extends Special {
   static identifier = "R";
-  static desc = "Clear random";
+  static desc = "Clear Random";
 
   static apply = (state: GameState, sourcePlayer: number) => {
     const myBoard = state.myBoard();
@@ -88,7 +97,7 @@ export class RandomClear extends Special {
 
 export class SwitchField extends Special {
   static identifier = "S";
-  static desc = "Switch fields";
+  static desc = "Switch Fields";
 
   static apply = (state: GameState, sourcePlayer: number) => {
     const theirBoard = state.playerBoard(sourcePlayer);
@@ -113,7 +122,7 @@ export class SwitchField extends Special {
 
 export class NukeField extends Special {
   static identifier = "N";
-  static desc = "Nuke field";
+  static desc = "Nuke Field";
 
   static apply = (state: GameState, sourcePlayer: number) => {
     const myBoard = state.myBoard();
@@ -128,7 +137,7 @@ export class NukeField extends Special {
 
 export class ClearSpecials extends Special {
   static identifier = "B";
-  static desc = "Clear specials";
+  static desc = "Clear Specials";
 
   static apply = (state: GameState, sourcePlayer: number) => {
     const myBoard = state.myBoard();
@@ -146,7 +155,7 @@ export class ClearSpecials extends Special {
 
 export class Gravity extends Special {
   static identifier = "G";
-  static desc = "Block gravity";
+  static desc = "Block Gravity";
 
   static apply = (state: GameState, sourcePlayer: number) => {
     const myBoard = state.myBoard();
@@ -208,7 +217,7 @@ export class QuakeField extends Special {
 
 export class BlockBomb extends Special {
   static identifier = "O";
-  static desc = "Block bomb";
+  static desc = "Block Bomb";
 
   static apply = (state: GameState, sourcePlayer: number) => {
     const myBoard = state.myBoard();

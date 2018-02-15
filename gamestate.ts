@@ -1,6 +1,7 @@
 import { BoardState, Cell } from 'boardstate';
 import { Special, AddLine, ClearLine, NukeField, RandomClear, SwitchField,
-         ClearSpecials, Gravity, QuakeField, BlockBomb, randomSpecial } from 'specials';
+         ClearSpecials, Gravity, QuakeField, BlockBomb,
+         randomSpecial, classicAddLines } from 'specials';
 import { Piece, randomPiece, cyclePiece } from 'pieces';
 import { BOARD_HEIGHT, BOARD_WIDTH } from 'consts';
 import { COLORS, randomColor, CLEARED_COLOR, draw_square } from 'draw_util';
@@ -118,7 +119,6 @@ export class GameState {
 
   // Reset the game to a "Unstarted" state
   resetGame = () => {
-    console.log("YOOOOO");
     this.status = Status.Unstarted;
 
     this.tickTime = 1000;
@@ -468,6 +468,7 @@ export class GameState {
     sendFieldUpdate(this.sock, this.myIndex, this.myBoard());
     if (linesRemoved > 1 && this.params.classicMode) {
       let num = linesRemoved == 4 ? 4 : linesRemoved-1;
+      this.specialMessage(classicAddLines[num], 0, this.myIndex);
       sendSpecial(this.sock, this.myIndex, 0, 'cs'+num);
     }
 
@@ -509,16 +510,18 @@ export class GameState {
 
     let special = this.specials.shift();
 
+    this.specialMessage(special, serverNum, this.myIndex);
     sendSpecial(this.sock, this.myIndex, serverNum,
                 special.identifier.toLowerCase());
 
     if (playerNum === 1) {
-      // We're applying the special to ourselves. The server doesn't echo it, so we need
-      // to apply it here.
+      // We're applying the special to ourselves. The server doesn't
+      // echo it, so we need to apply it here.
       special.apply(this, this.myIndex);
     } else if (special === SwitchField) {
-      // If we switch fields with someone else, we need to apply the change to our board too.
-      // It's symmetric, so we can pretend it was the other player applying it to us.
+      // If we switch fields with someone else, we need to apply the
+      // change to our board too.  It's symmetric, so we can pretend
+      // it was the other player applying it to us.
       special.apply(this, serverNum);
     }
 
@@ -530,7 +533,18 @@ export class GameState {
     this.removeLines();
   }
 
-  applySpecial = (special: typeof Special, fromPlayer: number) => {
+  specialMessage = (special: typeof Special, target: number, fromPlayer: number) => {
+    if (target == -1) return;
+    let name = target == 0 ? "All" : this.playerName(target);
+    this.message("<b>"+this.playerName(fromPlayer)+"</b> used " +
+                 special.desc + " on " + name);
+  }
+
+  applySpecial = (special: typeof Special, target: number, fromPlayer: number) => {
+    this.specialMessage(special, target, fromPlayer);
+
+    if (target > 0 && target != this.myIndex) return;
+
     special.apply(this, fromPlayer);
 
     if (!this.myBoard().move(0, 0)) {
@@ -584,21 +598,21 @@ export class GameState {
       this.sendSpecial(num);
     } else if (this.debugMode) {
       if (event.key === 'a') {
-        this.applySpecial(AddLine, 0);
+        this.applySpecial(AddLine, -1, 0);
       } else if (event.key === 'c') {
-        this.applySpecial(ClearLine, 0);
+        this.applySpecial(ClearLine, -1, 0);
       } else if (event.key === 'g') {
-        this.applySpecial(Gravity, 0);
+        this.applySpecial(Gravity, -1, 0);
       } else if (event.key === 'q') {
-        this.applySpecial(QuakeField, 0);
+        this.applySpecial(QuakeField, -1, 0);
       } else if (event.key === 'n') {
-        this.applySpecial(NukeField, 0);
+        this.applySpecial(NukeField, -1, 0);
       } else if (event.key === 'r') {
-        this.applySpecial(RandomClear, 0);
+        this.applySpecial(RandomClear, -1, 0);
       } else if (event.key === 'o') {
-        this.applySpecial(BlockBomb, 0);
+        this.applySpecial(BlockBomb, -1, 0);
       } else if (event.key === 'b') {
-        this.applySpecial(ClearSpecials, 0);
+        this.applySpecial(ClearSpecials, -1, 0);
       } else if (event.key === 'i') {
         this.nextPiece = cyclePiece(this.nextPiece);
       } else {

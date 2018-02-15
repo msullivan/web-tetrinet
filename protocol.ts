@@ -1,5 +1,5 @@
 import { BOARD_WIDTH, BOARD_HEIGHT } from "consts";
-import { SPECIALS, Special, ClassicAddLine } from 'specials';
+import { SPECIALS, Special, classicAddLines } from 'specials';
 import { GameState } from 'gamestate';
 import { BoardState, Cell } from 'boardstate';
 
@@ -104,15 +104,13 @@ function fieldUpdate(state: GameState, player: number, fieldstring: string) {
 function specialUsed(state: GameState,
                      target: number, typ: string, sender: number) {
   let special = special_map[typ];
-  if (target == state.myIndex && special !== undefined) {
-    state.applySpecial(special, sender);
+  if (special !== undefined) {
+    state.applySpecial(special, target, sender);
   }
   if (target == 0 && typ.startsWith("cs")) {
     // This is kind of ugly
     let cnt = parseInt(typ.substr(2));
-    for (let i = 0; i < cnt; i++) {
-      state.applySpecial(ClassicAddLine, sender);
-    }
+    state.applySpecial(classicAddLines[cnt], 0, sender);
   }
 }
 

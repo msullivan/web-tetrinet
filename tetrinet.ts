@@ -42,30 +42,42 @@ for (let i = 0; i < 100; i += 1) {
 export let state: GameState = null;
 console.log("Loaded");
 
-document.getElementById('chat-input').focus();
+function connectServer(username: string) {
+  document.getElementById('lobby').classList.remove('hidden');
+  document.getElementById('chat-input').focus();
 
-let hostname = window.location.hostname || "localhost";
-let url = "ws://" + hostname + ":8081/";
-let username = 'Guest' + randInt(10000);
-connectAndHandshake(
-  url,
-  username,
-  (playerNum: number, sock: WebSocket) => {
-    state = new GameState(playerNum,
-                          username,
-                          sock,
-                          mainCanvas,
-                          nextPieceCanvas,
-                          specialsCanvas,
-                          otherCanvases,
-                          new MessagePane(messagesDiv),
-                          new MessagePane(chatDiv),
-                          params);
-    document.addEventListener('keydown', state.onKeyDown);
-    document.getElementById('chat-input').addEventListener('keyup',
-                                                           state.onChatKey);
-    state.debugMode = true;
-    state.requestDraw();
-    sock.onmessage = (msg) => { processMessage(state, msg) };
+  let hostname = window.location.hostname || "localhost";
+  let url = "ws://" + hostname + ":8081/";
+  connectAndHandshake(
+    url,
+    username,
+    (playerNum: number, sock: WebSocket) => {
+      state = new GameState(playerNum,
+                            username,
+                            sock,
+                            mainCanvas,
+                            nextPieceCanvas,
+                            specialsCanvas,
+                            otherCanvases,
+                            new MessagePane(messagesDiv),
+                            new MessagePane(chatDiv),
+                            params);
+      document.addEventListener('keydown', state.onKeyDown);
+      document.getElementById('chat-input').addEventListener('keyup',
+                                                             state.onChatKey);
+      state.debugMode = true;
+      state.requestDraw();
+      sock.onmessage = (msg) => { processMessage(state, msg) };
+    }
+  );
+}
+
+if (window.location.hash) {
+  connectServer(window.location.hash.substr(1));
+} else {
+  let username = prompt("Please choose a username!");
+  if (username !== undefined && username !== "") {
+    window.location.hash = username;
+    connectServer(username);
   }
-);
+}

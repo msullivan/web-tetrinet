@@ -11,10 +11,6 @@ div.label {
     font-weight: bold;
 }
 
-div.playername {
-    display: inline;
-}
-
 div.inactive-player {
     color: rgb(200, 200, 200);
 }
@@ -119,14 +115,17 @@ div.level-box {
     width: 700px;
 }
 
-#player-list {
-    position: absolute;
+#chat-right-panel {
+	position: absolute;
     left: 720px;
     top: 10px;
+}
+
+#player-list {
     width: 200px;
     background: rgb(200, 200, 200);
 }
 
-div.playerlist-name {
-    display: inline;
+#start-button-box {
+	padding-top: 10px;
 }

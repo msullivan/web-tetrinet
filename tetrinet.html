@@ -16,25 +16,30 @@
       <div id="specials-caption">Clear Line</div>
       <canvas id="specials" width="962" height="34"></canvas>
       <span id="others"></span>
-      <div class="label inactive-player" id="label-2">2. <div class="playername" id="playername-2"></div></div>
-      <div class="label inactive-player" id="label-3">3. <div class="playername" id="playername-3"></div></div>
-      <div class="label inactive-player" id="label-4">4. <div class="playername" id="playername-4"></div></div>
-      <div class="label inactive-player" id="label-5">5. <div class="playername" id="playername-5"></div></div>
-      <div class="label inactive-player" id="label-6">6. <div class="playername" id="playername-6"></div></div>
+      <div class="label inactive-player" id="label-2">2. <span class="playername" id="playername-2"></span></div>
+      <div class="label inactive-player" id="label-3">3. <span class="playername" id="playername-3"></span></div>
+      <div class="label inactive-player" id="label-4">4. <span class="playername" id="playername-4"></span></div>
+      <div class="label inactive-player" id="label-5">5. <span class="playername" id="playername-5"></span></div>
+      <div class="label inactive-player" id="label-6">6. <span class="playername" id="playername-6"></span></div>
       <div id="messages"> </div>
       <div class="level-box">Level: <span id="level-display">0</span></div>
     </div>
     <div class="lobby hidden" id="lobby">
-      <div id="chat"></div>
-      <input id="chat-input"></input>
-      <div id="player-list">
-        1. <div class="playerlist-name" id="playerlist-1"></div><br>
-        2. <div class="playerlist-name" id="playerlist-2"></div><br>
-        3. <div class="playerlist-name" id="playerlist-3"></div><br>
-        4. <div class="playerlist-name" id="playerlist-4"></div><br>
-        5. <div class="playerlist-name" id="playerlist-5"></div><br>
-        6. <div class="playerlist-name" id="playerlist-6"></div><br>
-      </div>
+      <div class="chat" id="chat"></div>
+      <input id="chat-input" class="chat-input"></input>
+	  <div id="chat-right-panel">
+		<div id="player-list">
+          <div>1. <span class="playerlist-name" id="playerlist-1"></span></div>
+          <div>2. <span class="playerlist-name" id="playerlist-2"></span></div>
+          <div>3. <span class="playerlist-name" id="playerlist-3"></span></div>
+          <div>4. <span class="playerlist-name" id="playerlist-4"></span></div>
+          <div>5. <span class="playerlist-name" id="playerlist-5"></span></div>
+          <div>6. <span class="playerlist-name" id="playerlist-6"></span></div>
+		</div>
+		<div id="start-button-box">
+		  <button class="control-button" id="start-button">Start game</button>
+		</div>
+	  </div>
     </div>
   </body>
 </html>

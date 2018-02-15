@@ -12,6 +12,7 @@ sizeCanvasForBoard(mainCanvas);
 let nextPieceCanvas = document.getElementById('preview') as HTMLCanvasElement;
 let specialsCanvas = document.getElementById('specials') as HTMLCanvasElement;
 let messagesDiv = document.getElementById('messages') as HTMLDivElement;
+let chatDiv = document.getElementById('chat') as HTMLDivElement;
 
 let otherCanvases: HTMLCanvasElement[] = [];
 let OTHER_SCALE = 0.5;
@@ -50,6 +51,8 @@ function onUpdateSpecials(special: typeof Special) {
   }
 }
 
+document.getElementById('chat-input').focus();
+
 let hostname = window.location.hostname || "localhost";
 let url = "ws://" + hostname + ":8081/";
 let username = 'Guest' + randInt(10000);
@@ -65,9 +68,12 @@ connectAndHandshake(
                           specialsCanvas,
                           otherCanvases,
                           new MessagePane(messagesDiv),
+                          new MessagePane(chatDiv),
                           onUpdateSpecials,
                           params);
     document.addEventListener('keydown', state.onKeyDown);
+    document.getElementById('chat-input').addEventListener('keyup',
+                                                           state.onChatKey);
     state.debugMode = true;
     state.requestDraw();
     sock.onmessage = (msg) => { processMessage(state, msg) };

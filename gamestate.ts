@@ -5,7 +5,8 @@ import { Piece, randomPiece, cyclePiece } from 'pieces';
 import { BOARD_HEIGHT, BOARD_WIDTH } from 'consts';
 import { COLORS, randomColor, CLEARED_COLOR, draw_square } from 'draw_util';
 import { randInt, escapeHtml } from 'util';
-import { sendFieldUpdate, sendSpecial, sendStartStop, sendPlayerLost } from 'protocol';
+import { sendFieldUpdate, sendSpecial, sendStartStop, sendPlayerLost,
+         sendChatMessage } from 'protocol';
 import { MessagePane } from 'messagepane';
 
 export class GameParams {
@@ -64,6 +65,7 @@ export class GameState {
   nextPieceCanvas: HTMLCanvasElement;
   specialsCanvas: HTMLCanvasElement;
   messagePane: MessagePane;
+  chatPane: MessagePane;
   otherBoardCanvas: HTMLCanvasElement[];
   sock: WebSocket;
 
@@ -81,6 +83,7 @@ export class GameState {
               specialsCanvas: HTMLCanvasElement,
               otherBoardCanvas: HTMLCanvasElement[],
               messagePane: MessagePane,
+              chatPane: MessagePane,
               onUpdateSpecials: (x: typeof Special) => void,
               params: GameParams) {
     this.pendingDraw = false;
@@ -98,6 +101,7 @@ export class GameState {
     this.nextPieceCanvas = nextPieceCanvas;
     this.specialsCanvas = specialsCanvas;
     this.messagePane = messagePane;
+    this.chatPane = chatPane;
 
     this.params = params;
 
@@ -171,9 +175,12 @@ export class GameState {
       }
     }
     this.updateLabels();
+    document.getElementById('ingame').classList.remove('hidden');
+    document.getElementById('lobby').classList.add('hidden');
     this.status = Status.Playing;
     this.messagePane.clearMessages();
     this.message("The game has <b>started<b>.");
+    this.chatMessage("<b>*** The game has started</b>");
     this.requestDraw();
   }
 
@@ -189,9 +196,13 @@ export class GameState {
   }
 
   end = () => {
+    document.getElementById('ingame').classList.add('hidden');
+    document.getElementById('lobby').classList.remove('hidden');
+    document.getElementById('chat-input').focus();
     this.halt();
     this.resetGame();
     this.message("The game has <b>ended<b>.");
+    this.chatMessage("<b>*** The game has ended</b>");
     this.requestDraw();
   }
 
@@ -211,16 +222,19 @@ export class GameState {
   }
 
   private updateLabels = () => {
-    for (let i = 0; i < 6; i += 1) {
+    for (let i = 1; i <= 6; i += 1) {
       const localId = this.serverToLocalNumber(i);
       if (localId === 1) { continue; }
       const nameElement = document.getElementById('playername-'+localId);
       const labelElement = document.getElementById('label-'+localId);
+      const chatLabelElement = document.getElementById('playerlist-'+i); // uses server index.
       if (this.playerNames[i] === undefined) {
         nameElement.innerHTML = '';
+        chatLabelElement.innerHTML = '';
         labelElement.classList.add('inactive-player');
       } else {
         nameElement.innerText = this.playerNames[i];
+        chatLabelElement.innerHTML = this.playerNames[i];
         if (this.activePlayers[i]) {
           labelElement.classList.remove('inactive-player');
         } else {
@@ -228,6 +242,9 @@ export class GameState {
         }
       }
     }
+
+    const myChatLabel = document.getElementById('playerlist-'+this.myIndex);
+    myChatLabel.innerText = this.playerNames[this.myIndex];
   }
 
   // Player state management
@@ -236,9 +253,11 @@ export class GameState {
   }
   playerJoin = (num: number, name: string) => {
     this.playerNames[num] = name;
+    this.chatMessage("<b>*** " + escapeHtml(name) + "</b> has joined the game");
     this.updateLabels();
   }
   playerLeave = (num: number) => {
+    this.chatMessage("<b>*** " + escapeHtml(this.playerNames[num]) + "</b> has left the game");
     this.playerNames[num] = undefined;
     this.updateLabels();
   }
@@ -253,6 +272,18 @@ export class GameState {
     this.message("Player " + this.playerName(num) + " has lost!");
     this.activePlayers[num] = false;
     this.updateLabels();
+  }
+  changePlayerNum = (num: number) => {
+    this.playerNames[num] = this.playerNames[this.myIndex];
+    this.activePlayers[num] = this.activePlayers[this.myIndex];
+
+    this.playerNames[this.myIndex] = undefined;
+    this.activePlayers[this.myIndex] = undefined;
+
+    this.myIndex = num;
+    this.updateLabels();
+
+    console.log(this.myIndex);
   }
 
   //
@@ -328,6 +359,16 @@ export class GameState {
   private message = (msg: string) => {
     this.messagePane.addMessage(msg);
     console.log("MSG: ", msg);
+  }
+
+  private chatMessage = (msg: string) => {
+    const d = new Date();
+    function pad(n: number) {
+      return ('0' + n.toString()).substr(-2);
+    }
+    const ts = '<font color="grey">[' + pad(d.getHours()) + ':' +
+          pad(d.getMinutes()) + ':' + pad(d.getSeconds()) + ']</font>';
+    this.chatPane.addMessage(ts + ' ' + msg);
   }
 
   private tick = () => {
@@ -572,5 +613,45 @@ export class GameState {
       event.preventDefault();
     }
     this.requestDraw();
+  }
+
+  private formatChatMessage = (str: string) => {
+    console.log(str, escapeHtml(str));
+    str = escapeHtml(str);
+    str = str.replace(/\x04/g, '<font color="black">');
+    str = str.replace(/\x05/g, '<font color="brightblue">');
+    str = str.replace(/\x06/g, '<font color="grey">');
+    str = str.replace(/\x08/g, '<font color="magenta">');
+    str = str.replace(/\x0C/g, '<font color="darkgreen">');
+    str = str.replace(/\x0E/g, '<font color="brightgreen">');
+    // TODO: some more colors...
+    str = str.replace(/\x14/g, '<font color="brightred">');
+
+    console.log(str);
+    return str;
+  }
+
+  receiveChat = (from: number, message: string) => {
+    if (from === 0) {
+      // Server message
+      this.chatMessage("<b>***</b> "
+                       + this.formatChatMessage(message));
+
+    } else {
+      const playerName = this.playerName(from);
+      this.chatMessage("<b>&lt;" + playerName + "&gt;</b> "
+                       + this.formatChatMessage(message));
+    }
+  }
+
+  onChatKey = (event: any) => {
+    if (event.keyCode === 13) {
+      let element = document.getElementById('chat-input') as HTMLInputElement;
+      sendChatMessage(this.sock, this.myIndex, element.value);
+      if (element.value[0] !== '/') {
+        this.receiveChat(this.myIndex, element.value);
+      }
+      element.value = '';
+    }
   }
 }

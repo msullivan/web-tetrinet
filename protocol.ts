@@ -212,6 +212,10 @@ export function sendStartStop(sock: WebSocket, playerNum: number,
   send(sock, ['startgame', arg, playerNum]);
 }
 
+export function sendChatMessage(sock: WebSocket, playerNum: number, message: string) {
+  send(sock, ['pline', playerNum, message]);
+}
+
 export function processMessage(state: GameState, msg: MessageEvent) {
   console.log('RECV:', msg.data)
   let cmd = msg.data.split(' ');
@@ -234,6 +238,10 @@ export function processMessage(state: GameState, msg: MessageEvent) {
     state.playerWon(parseInt(cmd[1]));
   } else if (cmd[0] == 'playerlost') {
     state.playerLost(parseInt(cmd[1]));
+  } else if (cmd[0] == 'playernum') {
+    state.changePlayerNum(parseInt(cmd[1]));
+  } else if (cmd[0] == 'pline') {
+    state.receiveChat(parseInt(cmd[1]), msg.data.substr(cmd[0].length + 1 + cmd[1].length + 1));
   }
 
 }

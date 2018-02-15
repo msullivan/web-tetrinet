@@ -1,3 +1,7 @@
+.hidden {
+    display: none;
+}
+
 canvas {
     position: fixed;
 }
@@ -96,4 +100,27 @@ div.messages {
     width: 390px;
     height: 350px;
     overflow-y: scroll;
+}
+
+/* Chat/lobby view */
+div.chat {
+    width: 700;
+    height: 90%;
+    overflow-y: scroll;
+}
+
+input.chat-input {
+    width: 700;
+}
+
+div.player-list {
+    position: absolute;
+    left: 720px;
+    top: 10px;
+    width: 200px;
+    background: rgb(200, 200, 200);
+}
+
+div.playerlist-name {
+    display: inline;
 }

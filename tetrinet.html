@@ -9,7 +9,7 @@
     </script>
   </head>
   <body>
-    <div class="ingame">
+    <div class="ingame hidden" id="ingame">
       <canvas id="canvas" width="500" height="800"></canvas>
       <canvas id="preview" class="preview" width="200" height="200"></canvas>
       <div id="specials-caption" class="specials-caption">Clear Line</div>
@@ -21,6 +21,18 @@
       <div class="label label-5 inactive-player" id="label-5">5. <div class="playername" id="playername-5"></div></div>
       <div class="label label-6 inactive-player" id="label-6">6. <div class="playername" id="playername-6"></div></div>
       <div id="messages" class="messages"> </div>
+    </div>
+    <div class="lobby" id="lobby">
+      <div class="chat" id="chat"><b>*** Connected to server</b></div>
+      <input id="chat-input" class="chat-input"></input>
+      <div class="player-list" name="player-list">
+        1. <div class="playerlist-name" id="playerlist-1"></div><br>
+        2. <div class="playerlist-name" id="playerlist-2"></div><br>
+        3. <div class="playerlist-name" id="playerlist-3"></div><br>
+        4. <div class="playerlist-name" id="playerlist-4"></div><br>
+        5. <div class="playerlist-name" id="playerlist-5"></div><br>
+        6. <div class="playerlist-name" id="playerlist-6"></div><br>
+      </div>
     </div>
   </body>
 </html>

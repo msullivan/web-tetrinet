@@ -3,16 +3,16 @@ import { SQUARE_SIZE, BOARD_WIDTH, BOARD_HEIGHT, GAP } from 'consts';
 import { connectAndHandshake, processMessage } from 'protocol';
 import { sizeCanvasForBoard } from 'draw_util';
 import { Special } from 'specials';
-import { randInt } from 'util';
+import { randInt, $ } from 'util';
 import { MessagePane } from 'messagepane';
 
-let mainCanvas = document.getElementById('canvas') as HTMLCanvasElement;
+let mainCanvas = $('canvas') as HTMLCanvasElement;
 sizeCanvasForBoard(mainCanvas);
 
-let nextPieceCanvas = document.getElementById('preview') as HTMLCanvasElement;
-let specialsCanvas = document.getElementById('specials') as HTMLCanvasElement;
-let messagesDiv = document.getElementById('messages') as HTMLDivElement;
-let chatDiv = document.getElementById('chat') as HTMLDivElement;
+let nextPieceCanvas = $('preview') as HTMLCanvasElement;
+let specialsCanvas = $('specials') as HTMLCanvasElement;
+let messagesDiv = $('messages') as HTMLDivElement;
+let chatDiv = $('chat') as HTMLDivElement;
 
 let otherCanvases: HTMLCanvasElement[] = [];
 let OTHER_SCALE = 0.5;
@@ -23,7 +23,7 @@ for (let i = 0; i < 5; i++) {
   const ctx = canvas.getContext('2d', { alpha: false });
   ctx.scale(OTHER_SCALE, OTHER_SCALE);
 
-  let div = document.getElementById("others");
+  let div = $("others");
   div.appendChild(canvas);
   otherCanvases.push(canvas);
 }
@@ -32,8 +32,8 @@ export let state: GameState = null;
 console.log("Loaded");
 
 function connectServer(username: string) {
-  document.getElementById('lobby').classList.remove('hidden');
-  document.getElementById('chat-input').focus();
+  $('lobby').classList.remove('hidden');
+  $('chat-input').focus();
 
   let hostname = window.location.hostname || "localhost";
   let url = "ws://" + hostname + ":8081/";
@@ -51,8 +51,7 @@ function connectServer(username: string) {
                             new MessagePane(messagesDiv),
                             new MessagePane(chatDiv));
       document.addEventListener('keydown', state.onKeyDown);
-      document.getElementById('chat-input').addEventListener('keyup',
-                                                             state.onChatKey);
+      $('chat-input').addEventListener('keyup', state.onChatKey);
       state.requestDraw();
       sock.onmessage = (msg) => { processMessage(state, msg) };
     }

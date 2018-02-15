@@ -8,3 +8,6 @@ export function escapeHtml(str: string): string {
     div.appendChild(document.createTextNode(str));
     return div.innerHTML;
 }
+
+/* "Most of what I want from jquery" */
+export let $ = function(s: string) { return document.getElementById(s); };

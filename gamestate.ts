@@ -5,7 +5,7 @@ import { Special, AddLine, ClearLine, NukeField, RandomClear, SwitchField,
 import { Piece, randomPiece, cyclePiece } from 'pieces';
 import { BOARD_HEIGHT, BOARD_WIDTH } from 'consts';
 import { COLORS, randomColor, CLEARED_COLOR, draw_square } from 'draw_util';
-import { randInt, escapeHtml } from 'util';
+import { randInt, escapeHtml, $ } from 'util';
 import { sendFieldUpdate, sendSpecial, sendStartStop, sendPlayerLost,
          sendChatMessage, parseGameRules } from 'protocol';
 import { MessagePane } from 'messagepane';
@@ -127,7 +127,7 @@ export class GameState {
           this.params.levelIncrement +
           this.params.startingLevel;
     console.log(level);
-    document.getElementById('level-display').innerText = level.toString();
+    $('level-display').innerText = level.toString();
     this.tickTime = Math.max(1005 - level * 10);
   }
 
@@ -185,8 +185,8 @@ export class GameState {
       }
     }
     this.updateLabels();
-    document.getElementById('ingame').classList.remove('hidden');
-    document.getElementById('lobby').classList.add('hidden');
+    $('ingame').classList.remove('hidden');
+    $('lobby').classList.add('hidden');
     this.status = Status.Playing;
     this.messagePane.clearMessages();
     this.message("The game has <b>started<b>.");
@@ -206,9 +206,9 @@ export class GameState {
   }
 
   end = () => {
-    document.getElementById('ingame').classList.add('hidden');
-    document.getElementById('lobby').classList.remove('hidden');
-    document.getElementById('chat-input').focus();
+    $('ingame').classList.add('hidden');
+    $('lobby').classList.remove('hidden');
+    $('chat-input').focus();
     this.halt();
     this.resetGame();
     this.message("The game has <b>ended<b>.");
@@ -235,9 +235,9 @@ export class GameState {
     for (let i = 1; i <= 6; i += 1) {
       const localId = this.serverToLocalNumber(i);
       if (localId === 1) { continue; }
-      const nameElement = document.getElementById('playername-'+localId);
-      const labelElement = document.getElementById('label-'+localId);
-      const chatLabelElement = document.getElementById('playerlist-'+i); // uses server index.
+      const nameElement = $('playername-'+localId);
+      const labelElement = $('label-'+localId);
+      const chatLabelElement = $('playerlist-'+i); // uses server index.
       if (this.playerNames[i] === undefined) {
         nameElement.innerHTML = '';
         chatLabelElement.innerHTML = '';
@@ -253,7 +253,7 @@ export class GameState {
       }
     }
 
-    const myChatLabel = document.getElementById('playerlist-'+this.myIndex);
+    const myChatLabel = $('playerlist-'+this.myIndex);
     myChatLabel.innerText = this.playerNames[this.myIndex];
   }
 
@@ -351,7 +351,7 @@ export class GameState {
       new Cell(0, this.specials[i]).draw(ctx, i, 0);
     }
 
-    let elem = document.getElementById('specials-caption');
+    let elem = $('specials-caption');
     if (this.specials[0] !== undefined) {
       elem.innerHTML = this.specials[0].desc;
     } else {
@@ -678,7 +678,7 @@ export class GameState {
 
   onChatKey = (event: any) => {
     if (event.keyCode === 13) {
-      let element = document.getElementById('chat-input') as HTMLInputElement;
+      let element = $('chat-input') as HTMLInputElement;
       let msg = element.value;
       if (msg == '/xyzzy') {
         msg = "*** DEBUG MODE ENABLED ***";

@@ -18,7 +18,7 @@ let otherCanvases: HTMLCanvasElement[] = [];
 let OTHER_SCALE = 0.5;
 for (let i = 0; i < 5; i++) {
   let canvas = document.createElement('canvas') as HTMLCanvasElement;
-  canvas.className = 'canvas-' + i.toString();
+  canvas.id = 'canvas-' + i.toString();
   sizeCanvasForBoard(canvas, 0.5);
   const ctx = canvas.getContext('2d', { alpha: false });
   ctx.scale(OTHER_SCALE, OTHER_SCALE);

@@ -1,33 +1,33 @@
 <!DOCTYPE html>
 <html>
   <head>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.min.js"></script>
     <link rel="stylesheet" href="tetrinet.css" />
     <script>
       require(['tetrinet'], () => {});
     </script>
-	<title>Tetrinet</title>
+    <title>Tetrinet</title>
   </head>
   <body>
     <div class="ingame hidden" id="ingame">
       <canvas id="canvas" width="500" height="800"></canvas>
       <canvas id="preview" class="preview" width="200" height="200"></canvas>
-      <div id="specials-caption" class="specials-caption">Clear Line</div>
-      <canvas id="specials" class="specials" width="962" height="34"></canvas>
+      <div id="specials-caption">Clear Line</div>
+      <canvas id="specials" width="962" height="34"></canvas>
       <span id="others"></span>
-      <div class="label label-2 inactive-player" id="label-2">2. <div class="playername" id="playername-2"></div></div>
-      <div class="label label-3 inactive-player" id="label-3">3. <div class="playername" id="playername-3"></div></div>
-      <div class="label label-4 inactive-player" id="label-4">4. <div class="playername" id="playername-4"></div></div>
-      <div class="label label-5 inactive-player" id="label-5">5. <div class="playername" id="playername-5"></div></div>
-      <div class="label label-6 inactive-player" id="label-6">6. <div class="playername" id="playername-6"></div></div>
-      <div id="messages" class="messages"> </div>
+      <div class="label inactive-player" id="label-2">2. <div class="playername" id="playername-2"></div></div>
+      <div class="label inactive-player" id="label-3">3. <div class="playername" id="playername-3"></div></div>
+      <div class="label inactive-player" id="label-4">4. <div class="playername" id="playername-4"></div></div>
+      <div class="label inactive-player" id="label-5">5. <div class="playername" id="playername-5"></div></div>
+      <div class="label inactive-player" id="label-6">6. <div class="playername" id="playername-6"></div></div>
+      <div id="messages"> </div>
       <div class="level-box">Level: <span id="level-display">0</span></div>
     </div>
     <div class="lobby hidden" id="lobby">
-      <div class="chat" id="chat"></div>
-      <input id="chat-input" class="chat-input"></input>
-      <div class="player-list" name="player-list">
+      <div id="chat"></div>
+      <input id="chat-input"></input>
+      <div id="player-list">
         1. <div class="playerlist-name" id="playerlist-1"></div><br>
         2. <div class="playerlist-name" id="playerlist-2"></div><br>
         3. <div class="playerlist-name" id="playerlist-3"></div><br>

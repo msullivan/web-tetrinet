@@ -19,72 +19,72 @@ div.inactive-player {
     color: rgb(200, 200, 200);
 }
 
-canvas.canvas-0 {
+#canvas-0 {
     left: 600px;
 }
 
-div.label-2 {
+#label-2 {
     left: 630px;
     top: 365px;
     font-size: 16pt;
 }
 
-canvas.canvas-1 {
+#canvas-1 {
     left: 800px;
 }
 
-div.label-3 {
+#label-3 {
     left: 830px;
     top: 365px;
     font-size: 16pt;
 }
 
-canvas.canvas-2 {
+#canvas-2 {
     left: 1000px;
 }
 
-div.label-4 {
+#label-4 {
     left: 1030px;
     top: 365px;
     font-size: 16pt;
 }
 
-canvas.canvas-3 {
+#canvas-3 {
     left: 800px;
     top:  400px;
 }
 
-div.label-5 {
+#label-5 {
     left: 830px;
     top: 758px;
     font-size: 16pt;
 }
 
-canvas.canvas-4 {
+#canvas-4 {
     left: 1000px;
     top:  400px;
 }
 
-div.label-6 {
+#label-6 {
     left: 1030px;
     top: 758px;
     font-size: 16pt;
 }
 
-canvas.preview {
+#preview {
     left: 400px;
     width: 150px;
     background: black;
 }
 
-canvas.specials {
+#specials {
     top: 752px;
     width: 654px;
     height: 24px;
     left: 100px;
 }
 
-div.specials-caption {
+#specials-caption {
     position: fixed;
     top: 750px;
     height: 30px;
@@ -93,7 +93,7 @@ div.specials-caption {
     overflow: hidden;
 }
 
-div.messages {
+#messages {
     position: fixed;
     top: 400px;
     left: 400px;
@@ -109,17 +109,17 @@ div.level-box {
 }
 
 /* Chat/lobby view */
-div.chat {
+#chat {
     width: 700px;
     height: 90vh;
     overflow-y: scroll;
 }
 
-input.chat-input {
+#chat-input {
     width: 700px;
 }
 
-div.player-list {
+#player-list {
     position: absolute;
     left: 720px;
     top: 10px;

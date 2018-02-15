@@ -1,6 +1,6 @@
 import { BOARD_WIDTH, BOARD_HEIGHT } from "consts";
 import { SPECIALS, Special, classicAddLines } from 'specials';
-import { GameState } from 'gamestate';
+import { GameState, GameParams } from 'gamestate';
 import { BoardState, Cell } from 'boardstate';
 
 export function loginEncode(s: string): string {
@@ -114,10 +114,36 @@ function specialUsed(state: GameState,
   }
 }
 
+function parseGameRules(cmd: string[]): GameParams {
+  // https://github.com/xale/iTetrinet/wiki/new-game-rules-string
+  let parseFreqs = (s: string) => {
+    let a = [];
+    console.log(s);
+    for (let c of s) {
+      a.push(parseInt(c)-1);
+    }
+    return a;
+  }
+
+  let p = new GameParams();
+  p.tetrifast = cmd[0] == "*******";
+  p.startingHeight = parseInt(cmd[1]);
+  p.startingLevel = parseInt(cmd[2]);
+  p.linesPerLevel = parseInt(cmd[3]);
+  p.levelIncrement = parseInt(cmd[4]);
+  p.linesPerSpecial = parseInt(cmd[5]);
+  p.specialsAdded = parseInt(cmd[6]);
+  p.specialCapacity = parseInt(cmd[7]);
+  p.pieceFrequencies = parseFreqs(cmd[8]);
+  p.specialFrequencies = parseFreqs(cmd[9]);
+  p.averageLevels = cmd[10] == '1';
+  p.classicMode = cmd[11] == '1';
+
+  return p;
+}
 
 function newGame(state: GameState, cmd: string[]) {
-  // TODO: handle the rules string
-  // https://github.com/xale/iTetrinet/wiki/new-game-rules-string
+  state.params = parseGameRules(cmd);
   state.newGame();
   state.start();
 }

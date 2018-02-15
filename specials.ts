@@ -40,7 +40,7 @@ export class AddLine extends Special {
 
 let classicAddLinesN = (n: number) => {
   class ClassicAddLineN extends Special {
-    static desc = n + " Lines Added";
+    static desc = n + " Line" + (n > 1 ? "s" : "") + " Added";
 
     static applyOnce = (state: GameState, sourcePlayer: number) => {
       const board = state.myBoard();

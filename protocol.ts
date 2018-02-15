@@ -238,7 +238,7 @@ export function processMessage(state: GameState, msg: MessageEvent) {
     state.playerWon(parseInt(cmd[1]));
   } else if (cmd[0] == 'playerlost') {
     state.playerLost(parseInt(cmd[1]));
-  } else if (cmd[0] == 'playernum') {
+  } else if (cmd[0] == 'playernum' || cmd[0] == ')#)(!@(*3') {
     state.changePlayerNum(parseInt(cmd[1]));
   } else if (cmd[0] == 'pline') {
     state.receiveChat(parseInt(cmd[1]), msg.data.substr(cmd[0].length + 1 + cmd[1].length + 1));

@@ -114,7 +114,7 @@ function specialUsed(state: GameState,
   }
 }
 
-function parseGameRules(cmd: string[]): GameParams {
+export function parseGameRules(cmd: string[]): GameParams {
   // https://github.com/xale/iTetrinet/wiki/new-game-rules-string
   let parseFreqs = (s: string) => {
     let a = [];

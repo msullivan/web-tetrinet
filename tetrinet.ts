@@ -1,4 +1,4 @@
-import { GameState, GameParams } from 'gamestate';
+import { GameState } from 'gamestate';
 import { SQUARE_SIZE, BOARD_WIDTH, BOARD_HEIGHT, GAP } from 'consts';
 import { connectAndHandshake, processMessage } from 'protocol';
 import { sizeCanvasForBoard } from 'draw_util';
@@ -28,20 +28,6 @@ for (let i = 0; i < 5; i++) {
   otherCanvases.push(canvas);
 }
 
-let params = new GameParams();
-params.tetrifast = true;
-params.linesPerSpecial = 1;
-params.specialsAdded = 1;
-params.specialCapacity = 30;
-params.specialFrequencies = []
-params.classicMode = true;
-params.linesPerLevel = 1;
-params.levelIncrement = 1;
-params.startingLevel = 0;
-for (let i = 0; i < 100; i += 1) {
-  params.specialFrequencies.push(Math.floor(i/11.2));
-}
-
 export let state: GameState = null;
 console.log("Loaded");
 
@@ -63,8 +49,7 @@ function connectServer(username: string) {
                             specialsCanvas,
                             otherCanvases,
                             new MessagePane(messagesDiv),
-                            new MessagePane(chatDiv),
-                            params);
+                            new MessagePane(chatDiv));
       document.addEventListener('keydown', state.onKeyDown);
       document.getElementById('chat-input').addEventListener('keyup',
                                                              state.onChatKey);

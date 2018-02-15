@@ -7,7 +7,7 @@ import { BOARD_HEIGHT, BOARD_WIDTH } from 'consts';
 import { COLORS, randomColor, CLEARED_COLOR, draw_square } from 'draw_util';
 import { randInt, escapeHtml } from 'util';
 import { sendFieldUpdate, sendSpecial, sendStartStop, sendPlayerLost,
-         sendChatMessage } from 'protocol';
+         sendChatMessage, parseGameRules } from 'protocol';
 import { MessagePane } from 'messagepane';
 
 export class GameParams {
@@ -29,6 +29,11 @@ export class GameParams {
   averageLevels: boolean;
   classicMode: boolean;
 }
+// The params that get used for local testing in debug mode.
+const defaultParams = parseGameRules("******* 0 1 2 1 1 1 18 \
+3333333333333355555555555555222222222222222444444444444446666666666666677777777777777111111111111111\
+ 1111111111111111111111111111111122222222222222222234444444444455566666666666666788888899999999999999 \
+1 1".split(" "));
 
 enum Status {
   Unstarted,
@@ -82,8 +87,7 @@ export class GameState {
               specialsCanvas: HTMLCanvasElement,
               otherBoardCanvas: HTMLCanvasElement[],
               messagePane: MessagePane,
-              chatPane: MessagePane,
-              params: GameParams) {
+              chatPane: MessagePane) {
     this.pendingDraw = false;
 
     this.playerNames = [];
@@ -101,7 +105,7 @@ export class GameState {
     this.messagePane = messagePane;
     this.chatPane = chatPane;
 
-    this.params = params;
+    this.params = defaultParams;
 
     this.specials = [];
     this.activePlayers = [];
@@ -153,17 +157,17 @@ export class GameState {
   newGame = () => {
     this.resetGame();
 
-    this.nextPiece = randomPiece();
+    this.nextPiece = randomPiece(this.params.pieceFrequencies);
     this.nextOrientation = this.nextPiece.randomOrientation();
 
-    this.myBoard().newPiece(randomPiece(), 0);
+    this.myBoard().newPiece(randomPiece(this.params.pieceFrequencies), 0);
   }
 
   newPiece = () => {
     if (!this.myBoard().newPiece(this.nextPiece, this.nextOrientation)) {
       return this.die();
     }
-    this.nextPiece = randomPiece();
+    this.nextPiece = randomPiece(this.params.pieceFrequencies);
     this.nextOrientation = this.nextPiece.randomOrientation();
   }
 

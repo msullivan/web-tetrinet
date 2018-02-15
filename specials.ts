@@ -269,7 +269,5 @@ export const SPECIALS: (typeof Special)[] = [
 ];
 
 export function randomSpecial(specialsFreq: number[]): typeof Special {
-  const result = randInt(100);
-
-  return SPECIALS[specialsFreq[result]];
+  return SPECIALS[specialsFreq[randInt(100)]];
 }

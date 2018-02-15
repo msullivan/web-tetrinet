@@ -37,12 +37,12 @@ export class Piece {
 
 // https://tetris.wiki/TetriNet_Rotation_System
 export const PIECES = [
-  // 4x1
+  // I
   new Piece([
     new Shape([[-2, 0], [-1, 0], [0, 0], [1, 0]]),
     new Shape([[0, 0], [0, 1], [0, 2], [0, 3]]),
   ], 1),
-  // 2x2
+  // O
   new Piece([
     new Shape([[0, 0], [0, 1], [1, 0], [1, 1]]),
   ], 2),
@@ -79,8 +79,8 @@ export const PIECES = [
   ], 2)
 ];
 
-export function randomPiece(): Piece {
-  return PIECES[randInt(PIECES.length)];
+export function randomPiece(piecesFreq: number[]): Piece {
+  return PIECES[piecesFreq[randInt(100)]];
 }
 
 // for debugging

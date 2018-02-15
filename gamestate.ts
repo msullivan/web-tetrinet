@@ -73,8 +73,6 @@ export class GameState {
 
   activePlayers: boolean[];
 
-  onUpdateSpecials: (x: typeof Special) => void;
-
   constructor(myIndex: number,
               username: string,
               sock: WebSocket,
@@ -84,7 +82,6 @@ export class GameState {
               otherBoardCanvas: HTMLCanvasElement[],
               messagePane: MessagePane,
               chatPane: MessagePane,
-              onUpdateSpecials: (x: typeof Special) => void,
               params: GameParams) {
     this.pendingDraw = false;
 
@@ -107,9 +104,6 @@ export class GameState {
 
     this.specials = [];
     this.activePlayers = [];
-
-    this.onUpdateSpecials = onUpdateSpecials;
-
   }
 
   playing = (): boolean => { return this.status == Status.Playing }
@@ -340,6 +334,13 @@ export class GameState {
     for (let i = 0; i < this.specials.length; i += 1) {
       new Cell(0, this.specials[i]).draw(ctx, i, 0);
     }
+
+    let elem = document.getElementById('specials-caption');
+    if (this.specials[0] !== undefined) {
+      elem.innerHTML = this.specials[0].desc;
+    } else {
+      elem.innerHTML = '';
+    }
   }
 
   private draw = () => {
@@ -348,10 +349,6 @@ export class GameState {
     }
     this.drawPreview(this.nextPieceCanvas);
     this.drawSpecials(this.specialsCanvas);
-
-    if (this.onUpdateSpecials !== undefined) {
-      this.onUpdateSpecials(this.specials[0]);
-    }
 
     this.pendingDraw = false;
   }

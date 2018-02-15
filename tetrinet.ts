@@ -42,15 +42,6 @@ for (let i = 0; i < 100; i += 1) {
 export let state: GameState = null;
 console.log("Loaded");
 
-function onUpdateSpecials(special: typeof Special) {
-  let elem = document.getElementById('specials-caption');
-  if (special !== undefined) {
-    elem.innerHTML = special.desc;
-  } else {
-    elem.innerHTML = '';
-  }
-}
-
 document.getElementById('chat-input').focus();
 
 let hostname = window.location.hostname || "localhost";
@@ -69,7 +60,6 @@ connectAndHandshake(
                           otherCanvases,
                           new MessagePane(messagesDiv),
                           new MessagePane(chatDiv),
-                          onUpdateSpecials,
                           params);
     document.addEventListener('keydown', state.onKeyDown);
     document.getElementById('chat-input').addEventListener('keyup',

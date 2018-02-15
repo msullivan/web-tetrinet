@@ -10,6 +10,8 @@ import { MessagePane } from 'messagepane';
 
 export class GameParams {
   // See https://github.com/xale/iTetrinet/wiki/new-game-rules-string
+  tetrifast: boolean;
+
   startingHeight: number;
 
   startingLevel: number;

@@ -147,20 +147,29 @@ function connectProxy(url: string, onopen: () => void): WebSocket {
     sock.onmessage = undefined;
     onopen();
   };
+  sock.onerror = (error) => {
+    console.log("Hey there was an error");
+  }
+  sock.onclose = (error) => {
+    console.log("Hey the socket closed");
+  }
   return sock;
 }
 
 export function connectAndHandshake(
     url: string, username: string,
     onhandshake: (playerNum: number, sock: WebSocket) => void) {
-  let s = 'tetrisstart ' + username + ' 1.13';
+  // TODO: try a tetrifast connection and fall back to tetrisstart if it fails
+  let protocol = 'tetrifaster';
+
+  let s = protocol + ' ' + username + ' 1.13';
   let encoded = loginEncode(s);
 
   let sock: WebSocket;
   const process = (msg: MessageEvent) => {
     // initial handshake -- we get a player number and then report our team
     let cmd = msg.data.split(' ');
-    if (cmd[0] == 'playernum') {
+    if (cmd[0] == 'playernum' || cmd[0] == ')#)(!@(*3') {
       let playerNum = parseInt(cmd[1]);
       // Now that we have our number, set our (dummy) team
       sock.send('team ' + playerNum + ' ');
@@ -211,7 +220,7 @@ export function processMessage(state: GameState, msg: MessageEvent) {
     fieldUpdate(state, parseInt(cmd[1]), cmd[2]);
   } else if (cmd[0] == 'sb') {
     specialUsed(state, parseInt(cmd[1]), cmd[2], parseInt(cmd[3]));
-  } else if (cmd[0] == 'newgame') {
+  } else if (cmd[0] == 'newgame' || cmd[0] == '*******') {
     newGame(state, cmd);
   } else if (cmd[0] == 'pause') {
     pauseGame(state, parseInt(cmd[1]));

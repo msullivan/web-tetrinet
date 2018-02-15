@@ -28,6 +28,7 @@ for (let i = 0; i < 5; i++) {
 }
 
 let params = new GameParams();
+params.tetrifast = true;
 params.linesPerSpecial = 1;
 params.specialsAdded = 1;
 params.specialCapacity = 30;

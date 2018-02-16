@@ -136,7 +136,6 @@ export class GameState {
     const level = Math.floor(this.linesRemoved / this.params.linesPerLevel) *
           this.params.levelIncrement +
           this.params.startingLevel;
-    console.log(level);
     $('level-display').innerText = level.toString();
     this.tickTime = Math.max(1005 - level * 10);
   }
@@ -302,8 +301,6 @@ export class GameState {
 
     this.myIndex = num;
     this.updateLabels();
-
-    console.log(this.myIndex);
   }
 
   //
@@ -654,7 +651,6 @@ export class GameState {
   }
 
   private formatChatMessage = (str: string) => {
-    console.log(str, escapeHtml(str));
     str = escapeHtml(str);
     str = str.replace(/\x04/g, '<font color="black">');
     str = str.replace(/\x05/g, '<font color="brightblue">');
@@ -665,7 +661,6 @@ export class GameState {
     // TODO: some more colors...
     str = str.replace(/\x14/g, '<font color="brightred">');
 
-    console.log(str);
     return str;
   }
 

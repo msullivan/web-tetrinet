@@ -118,7 +118,6 @@ export function parseGameRules(cmd: string[]): GameParams {
   // https://github.com/xale/iTetrinet/wiki/new-game-rules-string
   let parseFreqs = (s: string) => {
     let a = [];
-    console.log(s);
     for (let c of s) {
       a.push(parseInt(c)-1);
     }
@@ -196,15 +195,14 @@ export function connectAndHandshake(
     if (cmd[0] == 'playernum' || cmd[0] == ')#)(!@(*3') {
       let playerNum = parseInt(cmd[1]);
       // Now that we have our number, set our (dummy) team
-      sock.send('team ' + playerNum + ' ');
+      send(sock, ['team', playerNum, '']);
       sock.onmessage = null;
       onhandshake(playerNum, sock);
     }
   };
   sock = connectProxy(url, () => {
     sock.onmessage = process;
-    sock.send(encoded);
-    console.log("sending ", encoded);
+    send(sock, [encoded]);
   });
 }
 //

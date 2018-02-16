@@ -105,6 +105,7 @@ export class GameState {
     this.myIndex = myIndex;
     this.username = username;
     this.playerNames[myIndex] = username;
+    this.params = defaultParams;
 
     this.resetGame();
 
@@ -115,8 +116,6 @@ export class GameState {
     this.messagePane = messagePane;
     this.chatPane = chatPane;
     this.ingameChatPane = ingameChatPane;
-
-    this.params = defaultParams;
 
     this.proto = new ProtocolManager(sock, myIndex);
 
@@ -164,10 +163,8 @@ export class GameState {
       this.boards.push(new BoardState(i));
     }
 
-    if (this.params !== undefined) {
-      for (let i = 0; i < this.params.startingHeight; i += 1) {
-        classicAddLines[1].apply(this, 0);
-      }
+    for (let i = 0; i < this.params.startingHeight; i += 1) {
+      classicAddLines[1].apply(this, 0);
     }
 
     this.nextPiece = undefined;

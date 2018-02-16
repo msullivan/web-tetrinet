@@ -308,11 +308,24 @@ export class GameState {
       }
     }
 
+    let ops = this.areWeOps();
+    for (let x of  document.getElementsByClassName("control-button")) {
+      let b = x as HTMLButtonElement;
+      b.disabled = !ops;
+    }
+
     const myChatLabel = $('playerlist-'+this.myIndex);
     myChatLabel.innerText = this.playerNames[this.myIndex];
   }
 
   // Player state management
+  private areWeOps = (): boolean => {
+    for (let i = 0; i < this.myIndex; i += 1) {
+      if (this.playerNames[i] !== undefined) return false;
+    }
+    return true;
+  }
+
   playerName = (num: number): string => {
     return escapeHtml(this.playerNames[num]);
   }

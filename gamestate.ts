@@ -641,6 +641,7 @@ export class GameState {
         this.applySpecial(ClearSpecials, -1, 0);
       } else if (event.key === 'i') {
         this.nextPiece = cyclePiece(this.nextPiece);
+        this.nextOrientation = 0;
       } else {
         action = false;
       }

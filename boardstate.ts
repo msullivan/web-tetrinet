@@ -35,6 +35,12 @@ export class Cell {
 
 }
 
+enum Intersection {
+  None = 0, /* is falsey. */
+  Regular,
+  Wall,
+}
+
 export class BoardState {
   board: Cell[][];
   x: number;
@@ -54,29 +60,39 @@ export class BoardState {
 
   rotate = () => {
     const new_orientation = (this.orientation + 1) % this.piece.shapes.length;
-    if (this.intersects(this.piece.shapes[new_orientation],
-                        this.x, this.y)) {
-      return;
-    } else {
-      this.orientation = new_orientation;
+    let shape = this.piece.shapes[new_orientation];
+    let inter = this.intersects(shape, this.x, this.y);
+    if (inter == Intersection.Regular) return;
+    if (inter == Intersection.Wall) {
+      // Now things get funky and we need to handle wall kicks: Blocks
+      // can kick one square off the right wall or two squares off the
+      // left (just I).
+      if (!this.intersects(shape, this.x - 1, this.y)) {
+        this.x -= 1;
+      } else if (!this.intersects(shape, this.x + 2, this.y)) {
+        this.x += 2;
+      } else {
+        return;
+      }
     }
+    this.orientation = new_orientation;
   }
 
   intersects = (shape: Shape, x: number, y: number) => {
+    let collides = false;
     for (let coord of shape.coords) {
       let new_x: number = coord[0] + x;
       let new_y: number = coord[1] + y;
 
-      if (this.board[new_x] === undefined ||
-          this.board[new_x][new_y] !== undefined ||
-          new_y >= BOARD_HEIGHT ||
-          new_x < 0 ||
-          new_x >= BOARD_WIDTH) {
-        return true;
+      // Wall kicks are allowed even when there would be another collision.
+      if (new_x < 0 || new_x >= BOARD_WIDTH) return Intersection.Wall;
+
+      console.assert(this.board[new_x] !== undefined);
+      if (this.board[new_x][new_y] !== undefined || new_y >= BOARD_HEIGHT) {
+        collides = true;
       }
     }
-
-    return false;
+    return collides ? Intersection.Regular : Intersection.None;
   }
 
   curShape = () => {

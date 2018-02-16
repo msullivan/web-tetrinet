@@ -13,6 +13,7 @@ let nextPieceCanvas = $('preview') as HTMLCanvasElement;
 let specialsCanvas = $('specials') as HTMLCanvasElement;
 let messagesDiv = $('messages') as HTMLDivElement;
 let chatDiv = $('chat') as HTMLDivElement;
+let ingameChatDiv = $('ingame-chat') as HTMLDivElement;
 
 let otherCanvases: HTMLCanvasElement[] = [];
 let OTHER_SCALE = 0.5;
@@ -49,9 +50,11 @@ function connectServer(username: string) {
                             specialsCanvas,
                             otherCanvases,
                             new MessagePane(messagesDiv),
-                            new MessagePane(chatDiv));
+                            new MessagePane(chatDiv),
+                            new MessagePane(ingameChatDiv));
       document.addEventListener('keydown', state.onKeyDown);
       $('chat-input').addEventListener('keyup', state.onChatKey);
+      $('ingame-chat-input').addEventListener('keyup', state.onIngameChatKey);
       $('start-button').addEventListener('click', state.onStartClick);
       $('debug-start-button').addEventListener('click', state.onDebugStartClick);
       $('pause-button').addEventListener('click', state.onPauseClick);

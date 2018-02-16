@@ -77,6 +77,7 @@ export class GameState {
   specialsCanvas: HTMLCanvasElement;
   messagePane: MessagePane;
   chatPane: MessagePane;
+  ingameChatPane: MessagePane;
   otherBoardCanvas: HTMLCanvasElement[];
   proto: ProtocolManager;
 
@@ -86,6 +87,8 @@ export class GameState {
 
   nextCodeIdx: number;
 
+  chatting: boolean;
+
   constructor(myIndex: number,
               username: string,
               sock: WebSocket,
@@ -94,7 +97,8 @@ export class GameState {
               specialsCanvas: HTMLCanvasElement,
               otherBoardCanvas: HTMLCanvasElement[],
               messagePane: MessagePane,
-              chatPane: MessagePane) {
+              chatPane: MessagePane,
+              ingameChatPane: MessagePane) {
     this.pendingDraw = false;
 
     this.playerNames = [];
@@ -110,6 +114,7 @@ export class GameState {
     this.specialsCanvas = specialsCanvas;
     this.messagePane = messagePane;
     this.chatPane = chatPane;
+    this.ingameChatPane = ingameChatPane;
 
     this.params = defaultParams;
 
@@ -119,6 +124,7 @@ export class GameState {
     this.activePlayers = [];
 
     this.nextCodeIdx = 0;
+    this.chatting = false;
   }
 
   playing = (): boolean => { return this.status == Status.Playing }
@@ -161,6 +167,12 @@ export class GameState {
     this.nextPiece = undefined;
 
     this.updateLevel();
+
+    this.chatting = false;
+
+    if (this.ingameChatPane !== undefined) {
+      this.ingameChatPane.clearMessages();
+    }
   }
 
   newGame = () => {
@@ -386,13 +398,18 @@ export class GameState {
     console.log("MSG: ", msg);
   }
 
-  private chatMessage = (msg: string) => {
+  private getTsString = () => {
     const d = new Date();
     function pad(n: number) {
       return ('0' + n.toString()).substr(-2);
     }
     const ts = '<font color="grey">[' + pad(d.getHours()) + ':' +
           pad(d.getMinutes()) + ':' + pad(d.getSeconds()) + ']</font>';
+    return ts;
+  }
+
+  private chatMessage = (msg: string) => {
+    const ts = this.getTsString();
     this.chatPane.addMessage(ts + ' ' + msg);
   }
 
@@ -597,6 +614,7 @@ export class GameState {
     }
 
     if (!this.playing()) return;
+    if (this.chatting) return;
 
     let action = true;
     if (event.key === 'ArrowUp') {
@@ -619,6 +637,10 @@ export class GameState {
     } else if (event.key === 'd') {
       this.specials.shift();
       this.requestDraw();
+    } else if (event.key === 't') {
+      this.chatting = true;
+      let element = $('ingame-chat-input') as HTMLInputElement;
+      element.focus();
     } else if (!isNaN(event.key)) {
       let num = parseInt(event.key);
       this.sendSpecial(num);
@@ -682,6 +704,16 @@ export class GameState {
     }
   }
 
+  receiveChatAct = (from: number, message: string) => {
+      const playerName = this.playerName(from);
+      this.chatMessage("* <i>" + playerName + " "
+                       + this.formatChatMessage(message) + "</i>");
+  }
+
+  receiveGameMessage = (message: string) => {
+    this.ingameChatPane.addMessage(this.getTsString() + " " + this.formatChatMessage(message));
+  }
+
   private enableDebugMode = () => {
     $('debug-start-box').classList.remove('hidden');
     this.debugMode = true;
@@ -703,6 +735,26 @@ export class GameState {
       element.value = '';
       if (msg == '/xyzzy') return this.enableDebugMode();
       this.sendChatMessage(msg);
+    }
+  }
+
+  private sendIngameChatMessage(msg: string) {
+    this.proto.sendIngameChatMessage("<" + this.playerNames[this.myIndex] + "> " + msg);
+  }
+
+  onIngameChatKey = (event: any) => {
+    let element = $('ingame-chat-input') as HTMLInputElement;
+    if (event.keyCode === 27) {
+      element.blur();
+      element.value = '';
+      this.chatting = false;
+    } else if (event.keyCode === 13) {
+      let msg = element.value;
+      element.value = '';
+      this.sendIngameChatMessage(msg);
+      element.blur();
+
+      this.chatting = false;
     }
   }
 

@@ -104,6 +104,20 @@ div.inactive-player {
     top: 200px;
 }
 
+#ingame-chat {
+    position: absolute;
+    width: 750px;
+    height: 50px;
+    top: 780px;
+    overflow-y: scroll;
+}
+
+#ingame-chat-input {
+    position: absolute;
+    width: 750px;
+    top: 830px;
+}
+
 /* Chat/lobby view */
 #chat {
     width: 700px;

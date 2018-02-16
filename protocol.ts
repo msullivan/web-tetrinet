@@ -249,6 +249,10 @@ export class ProtocolManager {
   sendChatMessage = (message: string) => {
     this.send(['pline', this.num, message]);
   }
+
+  sendIngameChatMessage = (message: string) => {
+    this.send(['gmsg', message]);
+  }
 }
 
 export function processMessage(state: GameState, msg: MessageEvent) {
@@ -277,6 +281,10 @@ export function processMessage(state: GameState, msg: MessageEvent) {
     state.changePlayerNum(parseInt(cmd[1]));
   } else if (cmd[0] == 'pline') {
     state.receiveChat(parseInt(cmd[1]), msg.data.substr(cmd[0].length + 1 + cmd[1].length + 1));
+  } else if (cmd[0] == 'plineact') {
+    state.receiveChatAct(parseInt(cmd[1]), msg.data.substr(cmd[0].length + 1 + cmd[1].length + 1));
+  } else if (cmd[0] == 'gmsg') {
+    state.receiveGameMessage(msg.data.substr(cmd[0].length + 1));
   }
 
 }

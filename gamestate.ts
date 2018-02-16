@@ -6,8 +6,7 @@ import { Piece, randomPiece, cyclePiece } from 'pieces';
 import { BOARD_HEIGHT, BOARD_WIDTH } from 'consts';
 import { COLORS, randomColor, CLEARED_COLOR, draw_square } from 'draw_util';
 import { randInt, escapeHtml, $ } from 'util';
-import { sendFieldUpdate, sendSpecial, sendStartStop, sendPauseResume,
-         sendPlayerLost, sendChatMessage, parseGameRules } from 'protocol';
+import { ProtocolManager, parseGameRules } from 'protocol';
 import { MessagePane } from 'messagepane';
 
 export class GameParams {
@@ -79,7 +78,7 @@ export class GameState {
   messagePane: MessagePane;
   chatPane: MessagePane;
   otherBoardCanvas: HTMLCanvasElement[];
-  sock: WebSocket;
+  proto: ProtocolManager;
 
   playerNames: string[];
 
@@ -105,7 +104,6 @@ export class GameState {
 
     this.resetGame();
 
-    this.sock = sock;
     this.myBoardCanvas = myBoardCanvas;
     this.otherBoardCanvas = otherBoardCanvas;
     this.nextPieceCanvas = nextPieceCanvas;
@@ -114,6 +112,8 @@ export class GameState {
     this.chatPane = chatPane;
 
     this.params = defaultParams;
+
+    this.proto = new ProtocolManager(sock, myIndex);
 
     this.specials = [];
     this.activePlayers = [];
@@ -234,8 +234,8 @@ export class GameState {
     this.status = Status.Dead;
     this.message("<b>You have lost!</b>");
     this.myBoard().deathFill();
-    sendFieldUpdate(this.sock, this.myIndex, this.myBoard());
-    sendPlayerLost(this.sock, this.myIndex);
+    this.proto.sendFieldUpdate(this.myBoard());
+    this.proto.sendPlayerLost();
     this.requestDraw();
   }
 
@@ -304,6 +304,7 @@ export class GameState {
     this.activePlayers[this.myIndex] = undefined;
 
     this.myIndex = num;
+    this.proto.updatePlayerNum(num);
     this.updateLabels();
   }
 
@@ -493,11 +494,11 @@ export class GameState {
       }
     }
 
-    sendFieldUpdate(this.sock, this.myIndex, this.myBoard());
+    this.proto.sendFieldUpdate(this.myBoard());
     if (linesRemoved > 1 && this.params.classicMode) {
       let num = linesRemoved == 4 ? 4 : linesRemoved-1;
       this.specialMessage(classicAddLines[num], 0, this.myIndex);
-      sendSpecial(this.sock, this.myIndex, 0, 'cs'+num);
+      this.proto.sendSpecial(0, 'cs'+num);
     }
 
     if (specialsToAdd > 0) {
@@ -541,8 +542,7 @@ export class GameState {
     let special = this.specials.shift();
 
     this.specialMessage(special, serverNum, this.myIndex);
-    sendSpecial(this.sock, this.myIndex, serverNum,
-                special.identifier.toLowerCase());
+    this.proto.sendSpecial(serverNum, special.identifier.toLowerCase());
 
     if (playerNum === 1) {
       // We're applying the special to ourselves. The server doesn't
@@ -555,7 +555,7 @@ export class GameState {
       special.apply(this, serverNum);
     }
 
-    sendFieldUpdate(this.sock, this.myIndex, this.myBoard());
+    this.proto.sendFieldUpdate(this.myBoard());
   }
 
   private freeze = () => {
@@ -689,7 +689,7 @@ export class GameState {
   }
 
   private sendChatMessage(msg: string) {
-    sendChatMessage(this.sock, this.myIndex, msg);
+    this.proto.sendChatMessage(msg);
     if (msg[0] !== '/') {
       this.receiveChat(this.myIndex, msg);
     }
@@ -708,19 +708,20 @@ export class GameState {
   onPauseClick = (event: any) => {
     // TODO: check that we are the op?
     if (this.status == Status.Playing) {
-      sendPauseResume(this.sock, this.myIndex, true);
+      this.proto.sendPauseResume(true);
     } else if (this.status == Status.Paused) {
-      sendPauseResume(this.sock, this.myIndex, false);
+      this.proto.sendPauseResume(false);
     }
   }
   onStartClick = (event: any) => {
+    // TODO: check that we are the op?
     if (this.status == Status.Unstarted) {
-      sendStartStop(this.sock, this.myIndex, true);
+      this.proto.sendStartStop(true);
     }
   }
   onEndClick = (event: any) => {
     // TODO: check that we are the op?
-    sendStartStop(this.sock, this.myIndex, false);
+    this.proto.sendStartStop(false);
   }
   onDebugStartClick = (event: any) => {
     if (!this.debugMode) return

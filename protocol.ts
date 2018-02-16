@@ -213,35 +213,42 @@ function send(sock: WebSocket, args: any[]) {
   sock.send(s);
 }
 
-export function sendFieldUpdate(sock: WebSocket, num: number, board: BoardState) {
-  // We always send a full update, since it is easy to compute and why not
-  let update = formatFullUpdate(board);
-  send(sock, ['f', num, update]);
-}
+export class ProtocolManager {
+  private sock: WebSocket;
+  private num: number;
+  constructor(sock: WebSocket, playerNum: number) {
+    this.sock = sock;
+    this.num = playerNum;
+  }
+  updatePlayerNum = (n: number) => { this.num = n; }
+  private send = (args: any[]) => { send(this.sock, args); }
 
-export function sendSpecial(sock: WebSocket, playerNum: number,
-                            target: number, special: string) {
-  send(sock, ['sb', target, special, playerNum]);
-}
+  sendFieldUpdate = (board: BoardState) => {
+    // We always send a full update, since it is easy to compute and why not
+    let update = formatFullUpdate(board);
+    this.send(['f', this.num, update]);
+  }
 
-export function sendPlayerLost(sock: WebSocket, playerNum: number) {
-  send(sock, ['playerlost', playerNum]);
-}
+  sendSpecial = (target: number, special: string) => {
+    this.send(['sb', target, special, this.num]);
+  }
 
-export function sendStartStop(sock: WebSocket, playerNum: number,
-                              startGame: boolean) {
-  let arg = startGame ? 1 : 0;
-  send(sock, ['startgame', arg, playerNum]);
-}
+  sendPlayerLost = () => {
+    this.send(['playerlost', this.num]);
+  }
+  sendStartStop = (startGame: boolean) => {
+    let arg = startGame ? 1 : 0;
+    this.send(['startgame', arg, this.num]);
+  }
 
-export function sendPauseResume(sock: WebSocket, playerNum: number,
-                              pauseGame: boolean) {
-  let arg = pauseGame ? 1 : 0;
-  send(sock, ['pause', arg, playerNum]);
-}
+  sendPauseResume = (pauseGame: boolean) => {
+    let arg = pauseGame ? 1 : 0;
+    this.send(['pause', arg, this.num]);
+  }
 
-export function sendChatMessage(sock: WebSocket, playerNum: number, message: string) {
-  send(sock, ['pline', playerNum, message]);
+  sendChatMessage = (message: string) => {
+    this.send(['pline', this.num, message]);
+  }
 }
 
 export function processMessage(state: GameState, msg: MessageEvent) {

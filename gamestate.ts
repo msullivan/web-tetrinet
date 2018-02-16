@@ -295,6 +295,7 @@ export class GameState {
     this.updateLabels();
   }
   playerLeave = (num: number) => {
+    if (this.playerNames[num] === undefined) return;
     this.chatMessage("<b>*** " + escapeHtml(this.playerNames[num]) + "</b> has left the game");
     this.playerNames[num] = undefined;
     this.updateLabels();
@@ -312,11 +313,13 @@ export class GameState {
     this.updateLabels();
   }
   changePlayerNum = (num: number) => {
-    this.playerNames[num] = this.playerNames[this.myIndex];
-    this.activePlayers[num] = this.activePlayers[this.myIndex];
+    let active: boolean = this.activePlayers[this.myIndex] == true; /* sigh */
 
     this.playerNames[this.myIndex] = undefined;
-    this.activePlayers[this.myIndex] = undefined;
+    this.activePlayers[this.myIndex] = false;
+
+    this.playerNames[num] = this.username;
+    this.activePlayers[num] = this.activePlayers[this.myIndex];
 
     this.myIndex = num;
     this.proto.updatePlayerNum(num);

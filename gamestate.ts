@@ -33,10 +33,15 @@ const defaultParams = parseGameRules("******* 0 1 2 1 1 1 18 \
  1111111111111111111111111111111122222222222222222234444444444455566666666666666788888899999999999999 \
 1 1".split(" "));
 
-enum Status {
+// There are two mostly orthogonal states,
+// except that PlayerStatus doesn't matter when the game is unstarted.
+enum GameStatus {
   Unstarted,
   Paused,
   Playing,
+}
+enum PlayerStatus {
+  Alive,
   Dead,
 }
 
@@ -49,7 +54,8 @@ const KONAMI_CODE = [
 export class GameState {
   params: GameParams;
 
-  status: Status;
+  gameStatus: GameStatus;
+  playerStatus: PlayerStatus;
 
   level: number;
   linesRemoved: number;
@@ -108,6 +114,9 @@ export class GameState {
 
     this.resetGame();
 
+    this.gameStatus = GameStatus.Unstarted;
+    this.playerStatus = PlayerStatus.Alive;
+
     this.myBoardCanvas = myBoardCanvas;
     this.otherBoardCanvas = otherBoardCanvas;
     this.nextPieceCanvas = nextPieceCanvas;
@@ -125,7 +134,10 @@ export class GameState {
     this.chatting = false;
   }
 
-  playing = (): boolean => { return this.status == Status.Playing }
+  playing = (): boolean => {
+    return this.gameStatus == GameStatus.Playing
+      && this.playerStatus == PlayerStatus.Alive;
+  }
 
   playerBoard = (n: number): BoardState => {
     return this.boards[n-1];
@@ -146,7 +158,7 @@ export class GameState {
 
   // Reset the game to a "Unstarted" state
   resetGame = () => {
-    this.status = Status.Unstarted;
+    this.gameStatus = GameStatus.Unstarted;
 
     this.tickTime = 1005;
     this.level = 0;
@@ -196,8 +208,10 @@ export class GameState {
 
   // Clear any running actions
   private go = () => {
-    this.timeoutID = setTimeout(this.tick, this.tickTime);
-    this.status = Status.Playing;
+    this.gameStatus = GameStatus.Playing;
+    if (this.playing()) {
+      this.timeoutID = setTimeout(this.tick, this.tickTime);
+    }
     this.requestDraw();
   }
 
@@ -218,6 +232,7 @@ export class GameState {
     this.messagePane.clearMessages();
     this.message("The game has <b>started<b>.");
     this.chatMessage("<b>*** The game has started</b>");
+    this.playerStatus = PlayerStatus.Alive;
     this.go();
   }
 
@@ -228,7 +243,7 @@ export class GameState {
 
   pause = () => {
     this.halt();
-    this.status = Status.Paused;
+    this.gameStatus = GameStatus.Paused;
     this.message("The game has <b>paused<b>.");
   }
 
@@ -245,7 +260,7 @@ export class GameState {
 
   private die = () => {
     this.halt();
-    this.status = Status.Dead;
+    this.playerStatus = PlayerStatus.Dead;
     this.message("<b>You have lost!</b>");
     this.myBoard().deathFill();
     this.proto.sendFieldUpdate(this.myBoard());
@@ -594,7 +609,7 @@ export class GameState {
   applySpecial = (special: typeof Special, target: number, fromPlayer: number) => {
     this.specialMessage(special, target, fromPlayer);
 
-    if (target > 0 && target != this.myIndex) return;
+    if (!this.playing() || (target > 0 && target != this.myIndex)) return;
 
     special.apply(this, fromPlayer);
 
@@ -625,7 +640,8 @@ export class GameState {
       this.nextCodeIdx = 0;
     }
 
-    if (event.key === 't' && this.status !== Status.Unstarted && !this.chatting) {
+    if (event.key === 't' &&
+        this.gameStatus !== GameStatus.Unstarted && !this.chatting) {
       this.chatting = true;
       let element = $('ingame-chat-input') as HTMLInputElement;
       element.focus();
@@ -771,15 +787,15 @@ export class GameState {
 
   onPauseClick = (event: any) => {
     // TODO: check that we are the op?
-    if (this.status == Status.Playing) {
+    if (this.gameStatus == GameStatus.Playing) {
       this.proto.sendPauseResume(true);
-    } else if (this.status == Status.Paused) {
+    } else if (this.gameStatus == GameStatus.Paused) {
       this.proto.sendPauseResume(false);
     }
   }
   onStartClick = (event: any) => {
     // TODO: check that we are the op?
-    if (this.status == Status.Unstarted) {
+    if (this.gameStatus == GameStatus.Unstarted) {
       this.proto.sendStartStop(true);
     }
   }

@@ -219,7 +219,9 @@ export class GameState {
     clearTimeout(this.timeoutID);
   }
 
-  start = () => {
+  // Common code for launching a game regardless of whether we are
+  // alive or coming in late and so already dead.
+  private gameSetup = () => {
     this.halt();
     for (let i = 0; i < 6; i += 1) {
       if (this.playerNames[i] !== undefined) {
@@ -230,10 +232,21 @@ export class GameState {
     $('ingame').classList.remove('hidden');
     $('lobby').classList.add('hidden');
     this.messagePane.clearMessages();
+  }
+
+  start = () => {
+    this.gameSetup();
     this.message("The game has <b>started<b>.");
     this.chatMessage("<b>*** The game has started</b>");
     this.playerStatus = PlayerStatus.Alive;
     this.go();
+  }
+
+  alreadyInGame = () => {
+    this.gameSetup();
+    this.message("The game is <b>in progress<b>.");
+    this.chatMessage("<b>*** The game is in progress</b>");
+    this.die();
   }
 
   resume = () => {

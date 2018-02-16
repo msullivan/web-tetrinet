@@ -273,6 +273,8 @@ export function processMessage(state: GameState, msg: MessageEvent) {
     pauseGame(state, parseInt(cmd[1]));
   } else if (cmd[0] == 'endgame') {
     state.end();
+  } else if (cmd[0] == 'ingame') {
+    state.alreadyInGame();
   } else if (cmd[0] == 'playerjoin') {
     state.playerJoin(parseInt(cmd[1]), cmd[2]);
   } else if (cmd[0] == 'playerleave') {

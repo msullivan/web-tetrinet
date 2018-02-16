@@ -512,7 +512,7 @@ export class GameState {
       if (this.specials.length >= this.params.specialCapacity) { break; }
       for (let i = 0; i < linesRemoved; i += 1) {
         if (this.specials.length >= this.params.specialCapacity) { break; }
-        this.specials.push(special);
+        this.specials.splice(randInt(this.specials.length + 1), 0, special);
       }
     }
 

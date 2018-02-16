@@ -586,7 +586,6 @@ export class GameState {
   }
 
   specialMessage = (special: typeof Special, target: number, fromPlayer: number) => {
-    if (target == -1) return;
     let name = target == 0 ? "All" : this.playerName(target);
     this.message("<b>"+this.playerName(fromPlayer)+"</b> used " +
                  special.desc + " on " + name);
@@ -665,7 +664,7 @@ export class GameState {
     } else if (this.debugMode) {
       if (event.key === 'w') {
         state.move(0, -1);
-      } if (event.key === 'd') {
+      } if (event.key === 'a') {
         this.myBoard().piece = cyclePiece(this.myBoard().piece);
         this.nextOrientation = 0;
       } else if (event.key === 's') {

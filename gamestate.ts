@@ -355,7 +355,7 @@ export class GameState {
     ctx.fillStyle = 'rgb(0, 0, 0)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = CLEARED_COLOR;
-    for (let x = 0; x < 30; x += 1) {
+    for (let x = 0; x < Math.min(30, this.params.specialCapacity); x += 1) {
       draw_square(ctx, x, 0);
     }
 

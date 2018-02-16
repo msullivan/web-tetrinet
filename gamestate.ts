@@ -728,9 +728,15 @@ export class GameState {
   }
 
   private sendChatMessage(msg: string) {
-    this.proto.sendChatMessage(msg);
-    if (msg[0] !== '/') {
-      this.receiveChat(this.myIndex, msg);
+    if (msg.split(' ')[0] === '/me') {
+      let actualMessage = msg.substr(4);
+      this.proto.sendChatAction(actualMessage);
+      this.receiveChatAct(this.myIndex, actualMessage);
+    } else {
+      this.proto.sendChatMessage(msg);
+      if (msg[0] !== '/') {
+        this.receiveChat(this.myIndex, msg);
+      }
     }
   }
 

@@ -250,6 +250,10 @@ export class ProtocolManager {
     this.send(['pline', this.num, message]);
   }
 
+  sendChatAction = (message: string) => {
+    this.send(['plineact', this.num, message]);
+  }
+
   sendIngameChatMessage = (message: string) => {
     this.send(['gmsg', message]);
   }

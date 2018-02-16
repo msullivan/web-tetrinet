@@ -54,6 +54,8 @@ function connectServer(username: string) {
       $('chat-input').addEventListener('keyup', state.onChatKey);
       $('start-button').addEventListener('click', state.onStartClick);
       $('debug-start-button').addEventListener('click', state.onDebugStartClick);
+      $('pause-button').addEventListener('click', state.onPauseClick);
+      $('end-button').addEventListener('click', state.onEndClick);
       state.requestDraw();
       sock.onmessage = (msg) => { processMessage(state, msg) };
     }

@@ -234,6 +234,12 @@ export function sendStartStop(sock: WebSocket, playerNum: number,
   send(sock, ['startgame', arg, playerNum]);
 }
 
+export function sendPauseResume(sock: WebSocket, playerNum: number,
+                              pauseGame: boolean) {
+  let arg = pauseGame ? 1 : 0;
+  send(sock, ['pause', arg, playerNum]);
+}
+
 export function sendChatMessage(sock: WebSocket, playerNum: number, message: string) {
   send(sock, ['pline', playerNum, message]);
 }

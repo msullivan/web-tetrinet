@@ -98,7 +98,7 @@ div.inactive-player {
     overflow-y: scroll;
 }
 
-div.level-box {
+#info-panel {
     position: fixed;
     left: 400px;
     top: 200px;

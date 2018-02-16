@@ -6,8 +6,8 @@ import { Piece, randomPiece, cyclePiece } from 'pieces';
 import { BOARD_HEIGHT, BOARD_WIDTH } from 'consts';
 import { COLORS, randomColor, CLEARED_COLOR, draw_square } from 'draw_util';
 import { randInt, escapeHtml, $ } from 'util';
-import { sendFieldUpdate, sendSpecial, sendStartStop, sendPlayerLost,
-         sendChatMessage, parseGameRules } from 'protocol';
+import { sendFieldUpdate, sendSpecial, sendStartStop, sendPauseResume,
+         sendPlayerLost, sendChatMessage, parseGameRules } from 'protocol';
 import { MessagePane } from 'messagepane';
 
 export class GameParams {
@@ -181,13 +181,18 @@ export class GameState {
   }
 
   // Clear any running actions
-  halt = () => {
+  private go = () => {
+    this.timeoutID = setTimeout(this.tick, this.tickTime);
+    this.status = Status.Playing;
+    this.requestDraw();
+  }
+
+  private halt = () => {
     clearTimeout(this.timeoutID);
   }
 
   start = () => {
     this.halt();
-    this.timeoutID = setTimeout(this.tick, this.tickTime);
     for (let i = 0; i < 6; i += 1) {
       if (this.playerNames[i] !== undefined) {
         this.activePlayers[i] = true;
@@ -196,16 +201,15 @@ export class GameState {
     this.updateLabels();
     $('ingame').classList.remove('hidden');
     $('lobby').classList.add('hidden');
-    this.status = Status.Playing;
     this.messagePane.clearMessages();
     this.message("The game has <b>started<b>.");
     this.chatMessage("<b>*** The game has started</b>");
-    this.requestDraw();
+    this.go();
   }
 
   resume = () => {
-    this.start();
     this.message("The game has <b>resumed<b>.");
+    this.go();
   }
 
   pause = () => {
@@ -701,11 +705,22 @@ export class GameState {
     }
   }
 
-  onStartClick = (event: any) => {
+  onPauseClick = (event: any) => {
     // TODO: check that we are the op?
+    if (this.status == Status.Playing) {
+      sendPauseResume(this.sock, this.myIndex, true);
+    } else if (this.status == Status.Paused) {
+      sendPauseResume(this.sock, this.myIndex, false);
+    }
+  }
+  onStartClick = (event: any) => {
     if (this.status == Status.Unstarted) {
       sendStartStop(this.sock, this.myIndex, true);
     }
+  }
+  onEndClick = (event: any) => {
+    // TODO: check that we are the op?
+    sendStartStop(this.sock, this.myIndex, false);
   }
   onDebugStartClick = (event: any) => {
     if (!this.debugMode) return

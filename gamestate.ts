@@ -164,6 +164,12 @@ export class GameState {
       this.boards.push(new BoardState(i));
     }
 
+    if (this.params !== undefined) {
+      for (let i = 0; i < this.params.startingHeight; i += 1) {
+        classicAddLines[1].apply(this, 0);
+      }
+    }
+
     this.nextPiece = undefined;
 
     this.updateLevel();

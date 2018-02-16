@@ -805,6 +805,7 @@ export class GameState {
     } else if (this.gameStatus == GameStatus.Paused) {
       this.proto.sendPauseResume(false);
     }
+    $('pause-button').blur();
   }
   onStartClick = (event: any) => {
     // TODO: check that we are the op?

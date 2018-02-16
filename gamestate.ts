@@ -608,6 +608,14 @@ export class GameState {
     this.requestDraw();
   }
 
+  onIngameChatFocus = (event: any) => {
+    this.chatting = true;
+  }
+
+  onIngameChatBlur = (event: any) => {
+    this.chatting = false;
+  }
+
   onKeyDown = (event: any) => {
     let state = this.myBoard();
 
@@ -617,6 +625,15 @@ export class GameState {
     } else {
       this.nextCodeIdx = 0;
     }
+
+    if (event.key === 't' && this.status !== Status.Unstarted && !this.chatting) {
+      this.chatting = true;
+      let element = $('ingame-chat-input') as HTMLInputElement;
+      element.focus();
+      event.preventDefault();
+      return;
+    }
+
 
     if (!this.playing()) return;
     if (this.chatting) return;
@@ -642,10 +659,6 @@ export class GameState {
     } else if (event.key === 'd') {
       this.specials.shift();
       this.requestDraw();
-    } else if (event.key === 't') {
-      this.chatting = true;
-      let element = $('ingame-chat-input') as HTMLInputElement;
-      element.focus();
     } else if (!isNaN(event.key)) {
       let num = parseInt(event.key);
       this.sendSpecial(num);

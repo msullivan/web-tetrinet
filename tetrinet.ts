@@ -55,6 +55,8 @@ function connectServer(username: string) {
       document.addEventListener('keydown', state.onKeyDown);
       $('chat-input').addEventListener('keyup', state.onChatKey);
       $('ingame-chat-input').addEventListener('keyup', state.onIngameChatKey);
+      $('ingame-chat-input').addEventListener('focus', state.onIngameChatFocus);
+      $('ingame-chat-input').addEventListener('blur', state.onIngameChatBlur);
       $('start-button').addEventListener('click', state.onStartClick);
       $('debug-start-button').addEventListener('click', state.onDebugStartClick);
       $('pause-button').addEventListener('click', state.onPauseClick);

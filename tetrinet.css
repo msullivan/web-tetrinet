@@ -110,6 +110,7 @@ div.inactive-player {
     height: 50px;
     top: 780px;
     overflow-y: scroll;
+    white-space: pre;
 }
 
 #ingame-chat-input {
@@ -123,6 +124,7 @@ div.inactive-player {
     width: 700px;
     height: 90vh;
     overflow-y: scroll;
+    white-space: pre;
 }
 
 #chat-input {

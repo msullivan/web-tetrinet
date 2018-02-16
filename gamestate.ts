@@ -42,6 +42,12 @@ enum Status {
   Dead,
 }
 
+const KONAMI_CODE = [
+  'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
+  'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
+  'b', 'a'
+];
+
 export class GameState {
   params: GameParams;
 
@@ -79,6 +85,8 @@ export class GameState {
 
   activePlayers: boolean[];
 
+  nextCodeIdx: number;
+
   constructor(myIndex: number,
               username: string,
               sock: WebSocket,
@@ -109,6 +117,8 @@ export class GameState {
 
     this.specials = [];
     this.activePlayers = [];
+
+    this.nextCodeIdx = 0;
   }
 
   playing = (): boolean => { return this.status == Status.Playing }
@@ -577,6 +587,13 @@ export class GameState {
 
   onKeyDown = (event: any) => {
     let state = this.myBoard();
+
+    if (!this.debugMode && event.key == KONAMI_CODE[this.nextCodeIdx]) {
+      this.nextCodeIdx++;
+      if (this.nextCodeIdx == KONAMI_CODE.length) return this.enableDebugMode();
+    } else {
+      this.nextCodeIdx = 0;
+    }
 
     if (!this.playing()) return;
 

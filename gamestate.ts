@@ -646,6 +646,7 @@ export class GameState {
 
     this.removeLines();
     this.requestDraw();
+    this.proto.sendFieldUpdate(this.myBoard());
   }
 
   onIngameChatFocus = (event: any) => {

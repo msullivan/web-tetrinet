@@ -271,3 +271,9 @@ export const SPECIALS: (typeof Special)[] = [
 export function randomSpecial(specialsFreq: number[]): typeof Special {
   return SPECIALS[specialsFreq[randInt(100)]];
 }
+
+// for debugging
+export function cycleSpecial(s: typeof Special): typeof Special {
+  let i = (SPECIALS.indexOf(s)+1)%SPECIALS.length;
+  return SPECIALS[i];
+}

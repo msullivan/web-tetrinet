@@ -1,7 +1,6 @@
 import { BoardState, Cell } from 'boardstate';
-import { Special, AddLine, ClearLine, NukeField, RandomClear, SwitchField,
-         ClearSpecials, Gravity, QuakeField, BlockBomb,
-         randomSpecial, classicAddLines } from 'specials';
+import { Special, SwitchField,
+         randomSpecial, classicAddLines, cycleSpecial } from 'specials';
 import { Piece, randomPiece, cyclePiece } from 'pieces';
 import { BOARD_HEIGHT, BOARD_WIDTH } from 'consts';
 import { COLORS, randomColor, CLEARED_COLOR, draw_square } from 'draw_util';
@@ -651,25 +650,13 @@ export class GameState {
       let num = parseInt(event.key);
       this.sendSpecial(num);
     } else if (this.debugMode) {
-      if (event.key === 'a') {
-        this.applySpecial(AddLine, -1, 0);
-      } else if (event.key === 'c') {
-        this.applySpecial(ClearLine, -1, 0);
-      } else if (event.key === 'g') {
-        this.applySpecial(Gravity, -1, 0);
-      } else if (event.key === 'q') {
-        this.applySpecial(QuakeField, -1, 0);
-      } else if (event.key === 'n') {
-        this.applySpecial(NukeField, -1, 0);
-      } else if (event.key === 'r') {
-        this.applySpecial(RandomClear, -1, 0);
-      } else if (event.key === 'o') {
-        this.applySpecial(BlockBomb, -1, 0);
-      } else if (event.key === 'b') {
-        this.applySpecial(ClearSpecials, -1, 0);
-      } else if (event.key === 'i') {
-        this.nextPiece = cyclePiece(this.nextPiece);
+      if (event.key === 'w') {
+        state.move(0, -1);
+      } if (event.key === 'd') {
+        this.myBoard().piece = cyclePiece(this.myBoard().piece);
         this.nextOrientation = 0;
+      } else if (event.key === 's') {
+        this.specials[0] = cycleSpecial(this.specials[0]);
       } else {
         action = false;
       }

@@ -126,6 +126,6 @@ div.level-box {
     background: rgb(200, 200, 200);
 }
 
-#start-button-box {
+div.control-button-box {
 	padding-top: 10px;
 }

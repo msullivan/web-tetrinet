@@ -578,17 +578,6 @@ export class GameState {
   onKeyDown = (event: any) => {
     let state = this.myBoard();
 
-    if (this.debugMode && event.key == 's') {
-      if (this.playing()) this.pause();
-      this.newGame();
-      this.start();
-    }
-    if (this.status == Status.Unstarted) {
-      if (event.key === 'p') {
-        sendStartStop(this.sock, this.myIndex, true);
-      }
-      return;
-    }
     if (!this.playing()) return;
 
     let action = true;
@@ -676,19 +665,40 @@ export class GameState {
     }
   }
 
+  private enableDebugMode = () => {
+    $('debug-start-box').classList.remove('hidden');
+    this.debugMode = true;
+    this.sendChatMessage("*** DEBUG MODE ENABLED ***");
+    this.message("<b>*** DEBUG MODE ENABLED ***</b>");
+  }
+
+  private sendChatMessage(msg: string) {
+    sendChatMessage(this.sock, this.myIndex, msg);
+    if (msg[0] !== '/') {
+      this.receiveChat(this.myIndex, msg);
+    }
+  }
+
   onChatKey = (event: any) => {
     if (event.keyCode === 13) {
       let element = $('chat-input') as HTMLInputElement;
       let msg = element.value;
-      if (msg == '/xyzzy') {
-        msg = "*** DEBUG MODE ENABLED ***";
-        this.debugMode = true;
-      }
-      sendChatMessage(this.sock, this.myIndex, msg);
-      if (msg[0] !== '/') {
-        this.receiveChat(this.myIndex, msg);
-      }
       element.value = '';
+      if (msg == '/xyzzy') return this.enableDebugMode();
+      this.sendChatMessage(msg);
     }
+  }
+
+  onStartClick = (event: any) => {
+    // TODO: check that we are the op?
+    if (this.status == Status.Unstarted) {
+      sendStartStop(this.sock, this.myIndex, true);
+    }
+  }
+  onDebugStartClick = (event: any) => {
+    if (!this.debugMode) return
+    this.halt();
+    this.newGame();
+    this.start();
   }
 }
